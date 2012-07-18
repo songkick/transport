@@ -4,7 +4,7 @@ Gem::Specification.new do |s|
   s.summary           = "HTTP client abstraction for service clients"
   s.author            = "James Coglan"
   s.email             = "james@songkick.com"
-  s.homepage          = "http://git.songkick.net/?p=songkick-transport"
+  s.homepage          = "http://github.com/songkick/transport"
 
   s.extra_rdoc_files  = %w[README.rdoc]
   s.rdoc_options      = %w[--main README.rdoc]
