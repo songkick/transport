@@ -1,0 +1,223 @@
+= Songkick::Transport
+
+http://songkickontour.appspot.com/lego_tourbus.png
+
+(Image from {Songkick on Tour}[http://songkickontour.appspot.com])
+
+This is a transport layer abstraction for talking to our service APIs. It
+provides an abstract HTTP-like interface while hiding the underlying transport
+and serialization details. It transparently deals with parameter serialization,
+including the following:
+
+* Correctly CGI-escaping any data you pass in
+* Nested parameters, e.g. <tt>'foo' => {'bar' => 'qux'}</tt>
+* File uploads and multipart requests
+* Entity body for POST/PUT, query string for everything else
+
+We currently support three backends:
+
+* Talking HTTP with {Curb}[http://curb.rubyforge.org/]
+* Talking HTTP with {HTTParty}[http://httparty.rubyforge.org/]
+* Talking directly to a {Rack}[http://rack.rubyforge.org/] app with Rack::Test
+
+It is assumed all service applications speak JSON as their serialization format.
+
+
+== Using the transports
+
+Let's say you're running a {Sinatra}[http://www.sinatrarb.com/] application that
+exposes some JSON:
+
+    require 'sinatra'
+    
+    get '/ohai' do
+      '{"hello":"world"}'
+    end
+
+In order to talk to this service, you select a transport to use and make the
+request:
+
+    require 'songkick/transport'
+    Transport = Songkick::Transport::Curb
+    
+    client = Transport.new('http://localhost:4567',
+                           :user_agent => 'Test Agent',
+                           :timeout    => 5)
+    
+    response = client.get('/ohai')
+    # => Songkick::Transport::Response::OK
+    
+    response.data
+    # => {"hello" => "world"}
+
+<tt>Songkick::Transport::Curb</tt> and <tt>Songkick::Transport::HttParty</tt>
+both take a hostname on instantiation. <tt>Songkick::Transport::RackTest</tt>
+takes a reference to a Rack application, for example:
+
+    require 'songkick/transport'
+    Transport = Songkick::Transport::RackTest
+    
+    client = Transport.new(Sinatra::Application,
+                           :user_agent => 'Test Agent',
+                           :timeout    => 5)
+
+All transports expose exactly the same instance methods.
+
+The client supports the +get+, +post+, +put+, +delete+ and +head+ methods,
+which all take a path and an optional +Hash+ of parameters, for example:
+
+    client.post('/users', :username => 'bob', :password => 'foo')
+
+If the response is successful, meaning there are no errors caused by the server-
+or client-side software or the network between them, then a response object is
+returned. If the response contains data, the object's +data+ method exposes it
+as a parsed data structure.
+
+The response's headers are exposed through the +headers+ method, which is an
+immutable hash-like object that normalizes various header conventions.
+
+    response = client.get('/users')
+    
+    # These all return 'application/json'
+    response.headers['Content-Type']
+    response.headers['content-type']
+    response.headers['HTTP_CONTENT_TYPE']
+
+If there is an error caused by our software, the request returns +nil+ and an
+error is logged. If there is an error caused by user input, a +UserError+
+response is returned with +data+ and +errors+ attributes.
+
+
+=== Nested parameters
+
+All transports support serialization of nested parameters, for example you can
+send this:
+
+    client.post('/venues', :venue => {:name => 'HMV Forum', :city_id => 4})
+
+and it will send this query string to the server:
+
+    venue[name]=HMV+Forum&venue[city_id]=4
+
+It can serialize fairly complicated data structures, within the limits of what
+can represented using query strings, for example this structure:
+
+    { "lisp" => ["define", {"square" => ["x", "y"]}, "*", "x", "x"] }
+
+is serialized as:
+
+    lisp[]=define&lisp[][square][]=x&lisp[][square][]=y&lisp[]=%2A&lisp[]=x&lisp[]=x
+
+Rails and Sinatra will parse this back into the original data structure for you
+on the server side.
+
+
+=== File uploads
+
+File uploads are handled transparently for you by the +post+ and +put+ methods.
+If the value of any parameter (including parameters nested inside hashes) is of
+type <tt>Songkick::Transport::IO</tt>, the whole request will be treated as
+<tt>multipart/form-data</tt> and all the data will be serialized for you.
+
+<tt>Songkick::Transport::IO</tt> must be instantiated with an IO object, a mime
+type, and a filename, for example:
+
+    file = File.open('concerts.xml')
+    io = Songkick::Transport::IO.new(file, 'application/xml', 'concerts.xml')
+    client.post('/inventories', :inventory => io)
+    file.close
+
+The file upload can be mixed with normal textual data, and nested hashes, for
+example:
+
+    client.post('/inventories', :inventory => {:file => io, :date => '2012-03-01'})
+
+On Sinatra, you get a hash containing both the tempfile and some metadata. You
+can use this to construct an +IO+ to forward to another service. The complete
+params look like:
+
+    {
+      :inventory => {
+        :file => {
+          :name     => "inventory[file]",
+          :filename => "concerts.xml",
+          :type     => "application/xml",
+          :tempfile => #<File:/tmp/RackMultipart20120301-31254-15b6o5r-0>,
+          :head     => "Content-Disposition: form-data; name=\"inventory[file]\"; filename=\"concerts.xml\"\r\nContent-Length: 6694\r\nContent-Type: application/xml\r\nContent-Transfer-Encoding: binary\r\n"
+        }
+        :date => "2012-03-01"
+      }
+    }
+    
+    file = params[:inventory][:file]
+    io = Songkick::Transport::IO.new(file[:tempfile], file[:type], file[:filename])
+
+On Rails 2, you just get a tempfile, but it has some additional methods to get
+what you need. The params look like this:
+
+    {
+      "inventory" => {
+        "file" => #<File:/tmp/CGI20120301-32754-gzgzdy-0>,
+        "date" => "2012-03-01"
+      }
+    }
+    
+    file = params["inventory"]["file"]
+    io = Songkick::Transport::IO.new(file, file.content_type, file.original_filename)
+
+<tt>Songkick::Transport</tt> has a helper for turning both these upload object
+types into an <tt>IO</tt> for you:
+
+    io = Songkick::Transport.io(params[:inventory][:file])
+
+You can then use this to forward uploaded files to another service from your
+Rails or Sinatra application.
+
+
+=== Logging and reporting
+
+You can enable basic logging by supplying a logger and switching logging on.
+
+    Songkick::Transport.logger = Logger.new(STDOUT)
+    Songkick::Transport.verbose = true
+
+The default setting (before you set <tt>Songkick::Transport.verbose = true</tt>
+is that Transport will warn you about all errors, i.e. any request that raises
+an exception. With <tt>verbose = true</tt>, it also logs the details of every
+request made; it logs the requests using a format you can paste into a +curl+
+command, and logs the status code, data and duration of every response.
+
+There is also a more advanced reporting system that lets you aggregate request
+statistics. During a request to a web application, many requests to backend
+services may be involved. The repoting system lets you collect information about
+all the backend requests that happened while executing a block. For example you
+can use it to create a logging middleware:
+
+    class Reporter
+      def initialize(app)
+        @app = app
+      end
+      
+      def call(env)
+        report = Songkick::Transport.report
+        response = report.execute { @app.call(env) }
+        # write report details somewhere
+        response
+      end
+    end
+
+The +report+ object is an array-like object that contains data for all the
+requests made during the block's execution. Each request responds to the
+following API:
+
+* +endpoint+ -- The origin the request was sent to
+* +verb+ -- The HTTP method of the request, e.g. <tt>"get"</tt>
+* +path+ -- The requested path
+* +params+ -- The hash of parameters used to make the request
+* +response+ -- The response object the request returned
+* +error+ -- The exception the request raised, if any
+* +duration+ -- The request's duration in milliseconds
+
+The +report+ object itself also responds to +total_duration+, which gives you
+the total time spent calling backend services during the block.
+
