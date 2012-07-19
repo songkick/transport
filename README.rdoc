@@ -1,6 +1,4 @@
-= Songkick::Transport
-
-{<img src="https://secure.travis-ci.org/songkick/transport.png?branch=master" alt="Build Status" />}[http://travis-ci.org/songkick/transport]
+= Songkick::Transport {<img src="https://secure.travis-ci.org/songkick/transport.png" />}[http://travis-ci.org/songkick/transport]
 
 http://songkickontour.appspot.com/lego_tourbus.png
 
