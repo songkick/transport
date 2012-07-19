@@ -1,5 +1,6 @@
 Gemfile.lock
 *.gem
+*.rbc
 .*~
 tmp/*
 config

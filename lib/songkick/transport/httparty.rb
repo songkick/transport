@@ -30,10 +30,10 @@ module Songkick
               head = headers.merge('Content-Type'   => req.content_type)
               self.class.__send__(verb, path, :body => req.body, :headers => head)
             else
-              self.class.__send__(verb, path, :body => params, :headers => headers)
+              self.class.__send__(verb, path, :body => req.body, :headers => headers)
             end
           else
-            self.class.__send__(verb, path, :query => params, :headers => headers)
+            self.class.__send__(verb, req.url, :headers => headers)
           end
           
           process(req, response.code, response.headers, response.parsed_response)
