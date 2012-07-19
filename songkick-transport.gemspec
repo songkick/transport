@@ -13,11 +13,12 @@ Gem::Specification.new do |s|
   s.files = %w[README.rdoc] +
             Dir.glob("{examples,lib,spec}/**/*.rb")
   
-  s.add_dependency "curb", ">= 0.3.0"
-  s.add_dependency "httparty", ">= 0.4.0"
   s.add_dependency "multipart-post", ">= 1.1.0"
-  s.add_dependency "rack-test", ">= 0.4.0"
   s.add_dependency "yajl-ruby", ">= 1.1.0"
+  
+  s.add_development_dependency "curb", ">= 0.3.0"
+  s.add_development_dependency "httparty", ">= 0.4.0"
+  s.add_development_dependency "rack-test", ">= 0.4.0"
 
   s.add_development_dependency "guard-rspec"
   s.add_development_dependency "rspec"
