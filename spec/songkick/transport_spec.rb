@@ -148,16 +148,6 @@ describe Songkick::Transport do
         @report.total_duration.should == 3.14
       end
     end
-    
-    describe "errors" do
-      context "the request times-out" do
-        it "should raise a Transport::TimeoutError error"
-      end
-      context "Could not connect to host" do
-        it "should raise a Transport::ConnectionFailedError error"
-      end
-    end
-    
   end
   
   describe Songkick::Transport::Curb do
