@@ -55,12 +55,9 @@ module Songkick
         Serialization.build_url(@verb, @endpoint, @path, @params)
       end
       
-      def scrubbed_url
-        Serialization.build_url(@verb, @endpoint, @path, @params, true)
-      end
-      
       def to_s
-        command = "#{@verb.upcase} '#{scrubbed_url}'"
+        url = Serialization.build_url(@verb, @endpoint, @path, @params, true)
+        command = "#{@verb.upcase} '#{url}'"
         return command unless use_body?
         query = Serialization.build_query_string(params, true, true)
         command << " -H 'Content-Type: #{content_type}'"

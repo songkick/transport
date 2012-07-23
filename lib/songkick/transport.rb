@@ -32,8 +32,10 @@ module Songkick
     IO = UploadIO
     
     def self.logger
-      # temporary measure while migration from janda to gem
-      @logger ||= Object.new.extend(Songkick::Diagnostics::HasLogger).logger
+      @logger ||= begin
+                    require 'logger'
+                    Logger.new(STDOUT)
+                  end
     end
     
     def self.logger=(logger)
@@ -62,6 +64,14 @@ module Songkick
     
     def self.report
       Reporting.report
+    end
+    
+    def self.sanitize(*params)
+      sanitized_params.concat(params)
+    end
+    
+    def self.sanitized_params
+      @sanitized_params ||= []
     end
     
     class Base

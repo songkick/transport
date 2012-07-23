@@ -187,6 +187,14 @@ an exception. With <tt>verbose = true</tt>, it also logs the details of every
 request made; it logs the requests using a format you can paste into a +curl+
 command, and logs the status code, data and duration of every response.
 
+There may be params you don't want in your logs, and you can specify those:
+
+    Songkick::Transport.sanitize 'password', /access_token/
+
+This method accepts both strings and regexes. Any parameter name (as serialized
+in a query string) that matches one of these will be logged as e.g.
+<tt>password=[REMOVED]</tt>.
+
 There is also a more advanced reporting system that lets you aggregate request
 statistics. During a request to a web application, many requests to backend
 services may be involved. The repoting system lets you collect information about

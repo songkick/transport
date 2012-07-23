@@ -4,6 +4,8 @@ module Songkick
       
       extend self
       
+      SANITIZED_VALUE = '[REMOVED]'
+      
       def build_url(verb, host, path, params, scrub=false)
         url = host + path
         return url if USE_BODY.include?(verb)
@@ -11,14 +13,13 @@ module Songkick
         url + (qs == '' ? '' : '?' + qs)
       end
       
-      def build_query_string(params, fully_encode = true, scrub=false)
+      def build_query_string(params, fully_encode = true, sanitize = false)
         pairs = []
         each_qs_param('', params) do |key, value|
-          if scrub and key =~ /password|token|secret|assertion/
-            pairs << [key, "******"]
-          else
-            pairs << [key, value]
+          if sanitize and sanitize?(key)
+            value = SANITIZED_VALUE
           end
+          pairs << [key, value]
         end
         if fully_encode
           pairs.map { |p| p.join('=') }.join('&') 
@@ -52,6 +53,10 @@ module Songkick
         when Array then params.any? { |e|   multipart? e }
         else Transport::IO === params
         end
+      end
+      
+      def sanitize?(key)
+        Transport.sanitized_params.any? { |param| param === key }
       end
       
       def serialize_multipart(params, boundary = Multipartable::DEFAULT_BOUNDARY)
