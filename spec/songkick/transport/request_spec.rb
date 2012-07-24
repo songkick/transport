@@ -1,26 +1,36 @@
 require "spec_helper"
 
 describe Songkick::Transport::Request do
+  let :params do
+    {:username => "Louis", :password => "CK", :access => {:token => "foo"}}
+  end
+  
   let :get_request do
-    Songkick::Transport::Request.new "www.example.com", "GET", "/", :username => "Louis", :password => "CK", :access => {:token => "foo"}
+    Songkick::Transport::Request.new("www.example.com", "GET", "/", params)
   end
   
   let :post_request do
-    Songkick::Transport::Request.new "www.example.com", "POST", "/", :username => "Louis", :password => "CK", :access => {:token => "foo"}
+    Songkick::Transport::Request.new("www.example.com", "POST", "/", params)
+  end
+  
+  def query(request, pattern)
+    request.to_s.scan(pattern).flatten.first.split("&").sort
   end
   
   describe :to_s do
     context "with a get request" do
       it "returns the request as a curl command" do
-        ["GET 'www.example.com/?", "username=Louis", "password=CK", "access[token]=foo"].each{|string| get_request.to_s.should include(string)}
+        pattern = %r{^GET 'www.example.com/\?([^']+)'$}
+        get_request.to_s.should =~ pattern
+        query(get_request, pattern).should == ["access[token]=foo", "password=CK", "username=Louis"]
       end
     end
+    
     context "with a post request" do
       it "returns the request as a curl command" do
-        ["POST 'www.example.com/' -H 'Content-Type: application/x-www-form-urlencoded' -d '",
-          "username=Louis",
-          "password=CK",
-          "access[token]=foo"].each{|string| post_request.to_s.should include(string) }
+        pattern = %r{^POST 'www.example.com/' -H 'Content-Type: application/x-www-form-urlencoded' -d '([^']+)'$}
+        post_request.to_s.should =~ pattern
+        query(post_request, pattern).should == ["access[token]=foo", "password=CK", "username=Louis"]
       end
     end
     
@@ -31,15 +41,17 @@ describe Songkick::Transport::Request do
 
       context "with a get request" do
         it "removes the parameter values from the request" do
-          ["GET 'www.example.com/?", "username=Louis", "password=[REMOVED]", "access[token]=[REMOVED]"].each{|string| get_request.to_s.should include(string)}
+          pattern = %r{^GET 'www.example.com/\?([^']+)'$}
+          get_request.to_s.should =~ pattern
+          query(get_request, pattern).should == ["access[token]=[REMOVED]", "password=[REMOVED]", "username=Louis"]
         end
       end
+      
       context "with a post request" do
         it "removes the parameter values from the request" do
-          ["POST 'www.example.com/' -H 'Content-Type: application/x-www-form-urlencoded' -d '",
-           "username=Louis",
-           "password=[REMOVED]",
-           "access[token]=[REMOVED]"].each{|string| post_request.to_s.should include(string)}
+          pattern = %r{^POST 'www.example.com/' -H 'Content-Type: application/x-www-form-urlencoded' -d '([^']+)'$}
+          post_request.to_s.should =~ pattern
+          query(post_request, pattern).should == ["access[token]=[REMOVED]", "password=[REMOVED]", "username=Louis"]
         end
       end
     end
