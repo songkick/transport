@@ -20,7 +20,7 @@ module Songkick
         return unless Transport.verbose?
         duration = (Time.now.to_f - request.start_time.to_f) * 1000
         logger.info "Response status: #{response.status}, duration: #{duration.ceil}ms"
-        logger.info "Response data: #{response.data.inspect}"
+        logger.debug "Response data: #{response.data.inspect}"
       end
       
       def self.logger
