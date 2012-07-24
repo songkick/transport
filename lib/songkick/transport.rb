@@ -14,6 +14,7 @@ module Songkick
     
     ROOT = File.expand_path('..', __FILE__)
     autoload :Serialization,  ROOT + '/transport/serialization'
+    autoload :Base,           ROOT + '/transport/base'
     autoload :Curb,           ROOT + '/transport/curb'
     autoload :Headers,        ROOT + '/transport/headers'
     autoload :HttParty,       ROOT + '/transport/httparty'
@@ -30,6 +31,18 @@ module Songkick
     autoload :HttpError,            ROOT + '/transport/http_error'
     
     IO = UploadIO
+    
+    def self.io(object)
+      if Hash === object and [:tempfile, :type, :filename].all? { |k| object.has_key? k } # Rack upload
+        Transport::IO.new(object[:tempfile], object[:type], object[:filename])
+        
+      elsif object.respond_to?(:content_type) and object.respond_to?(:original_filename) # Rails upload
+        Transport::IO.new(object, object.content_type, object.original_filename)
+        
+      else
+        raise ArgumentError, "Could not generate a Transport::IO from #{object.inspect}"
+      end
+    end
     
     def self.logger
       @logger ||= begin
@@ -50,18 +63,6 @@ module Songkick
       @verbose
     end
     
-    def self.io(object)
-      if Hash === object and [:tempfile, :type, :filename].all? { |k| object.has_key? k } # Rack upload
-        Transport::IO.new(object[:tempfile], object[:type], object[:filename])
-        
-      elsif object.respond_to?(:content_type) and object.respond_to?(:original_filename) # Rails upload
-        Transport::IO.new(object, object.content_type, object.original_filename)
-        
-      else
-        raise ArgumentError, "Could not generate a Transport::IO from #{object.inspect}"
-      end
-    end
-    
     def self.report
       Reporting.report
     end
@@ -72,45 +73,6 @@ module Songkick
     
     def self.sanitized_params
       @sanitized_params ||= []
-    end
-    
-    class Base
-      attr_accessor :user_agent
-      
-      HTTP_VERBS.each do |verb|
-        class_eval %{
-          def #{verb}(path, params = {})
-            req = Request.new(endpoint, '#{verb}', path, params)
-            Reporting.log_request(req)
-            
-            response = execute_request(req)
-            
-            Reporting.log_response(response, req)
-            Reporting.record(endpoint, '#{verb}', path, params, req.start_time, response)
-            response
-          rescue => error
-            Reporting.record(endpoint, '#{verb}', path, params, req.start_time, nil, error)
-            raise error
-          end
-        }
-      end
-      
-    private
-      
-      def process(url, status, headers, body)
-        Response.process(url, status, headers, body)
-      end
-      
-      def headers
-        {
-          'Connection' => 'close',
-          'User-Agent' => user_agent || ''
-        }
-      end
-      
-      def logger
-        Transport.logger
-      end
     end
     
   end
