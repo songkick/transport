@@ -88,6 +88,45 @@ error is logged. If there is an error caused by user input, a +UserError+
 response is returned with +data+ and +errors+ attributes.
 
 
+=== Response conventions
+
+This library was primarily developed to talk to Songkick's backend services, and
+as such adopts some conventions that put it at a higher level of abstraction
+than a vanilla HTTP client.
+
+It assumes successful responses will all contain JSON data. A response object
+has the following properties:
+
+* +data+ -- the result of parsing the body as JSON
+* +headers+ -- a read-only hash-like object containing response headers
+* +status+ -- the response's status code
+
+Only responses with status codes, 200 (OK), 201 (Created), 204 (No Content), and
+409 (Conflict) yield response objects. All other status codes cause an exception
+to be raised. We use 409 to indicate user error, i.e. input validation errors as
+opposed to software/infrastructure errors. The response object is typed for the
+status code; the possible types are:
+
+* 200: <tt>Songkick::Transport::Response::OK</tt>
+* 201: <tt>Songkick::Transport::Response::Created</tt>
+* 204: <tt>Songkick::Transport::Response::NoContent</tt>
+* 409: <tt>Songkick::Transport::Response::UserError</tt>
+
+If the request raises an exception, it will be of one of the following types:
+
+* <tt>Songkick::Transport::UpstreamError</tt> -- generic base error type
+* <tt>Songkick::Transport::HostResolutionError</tt> -- the hostname could be
+  resolved using DNS
+* <tt>Songkick::Transport::ConnectionFailedError</tt> -- a TCP connection could
+  not be made to the host
+* <tt>Songkick::Transport::TimeoutError</tt> -- the request timed out before a
+  response could be received
+* <tt>Songkick::Transport::InvalidJSONError</tt> -- the response contained
+  invalid JSON
+* <tt>Songkick::Transport::HttpError</tt> -- we received a response with a
+  non-successful status code, e.g. 404 or 500
+
+
 === Nested parameters
 
 All transports support serialization of nested parameters, for example you can
@@ -110,6 +149,21 @@ is serialized as:
 
 Rails and Sinatra will parse this back into the original data structure for you
 on the server side.
+
+
+=== Request headers and timeouts
+
+You can make requests with custom headers using +with_headers+. The return value
+of +with_headers+ works just like a client object, so you can use it for
+multiple requests:
+
+    auth = client.with_headers('Authorization' => 'OAuth abc123')
+    auth.get('/me')
+    auth.put('/users/99', :username => 'bob')
+
+Similarly, the request timeout can be adjusted per-request:
+
+    client.with_timeout(10).get('/slow_resource')
 
 
 === File uploads
