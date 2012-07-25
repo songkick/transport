@@ -13,6 +13,7 @@ module Songkick
     USE_BODY   = %w[post put]
     
     ROOT = File.expand_path('..', __FILE__)
+    
     autoload :Serialization,    ROOT + '/transport/serialization'
     autoload :Base,             ROOT + '/transport/base'
     autoload :Curb,             ROOT + '/transport/curb'
@@ -23,6 +24,7 @@ module Songkick
     autoload :Reporting,        ROOT + '/transport/reporting'
     autoload :Request,          ROOT + '/transport/request'
     autoload :Response,         ROOT + '/transport/response'
+    autoload :TimeoutDecorator, ROOT + '/transport/timeout_decorator'
 
     autoload :UpstreamError,        ROOT + '/transport/upstream_error'
     autoload :HostResolutionError,  ROOT + '/transport/upstream_error'

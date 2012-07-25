@@ -1,16 +1,16 @@
 module Songkick
   module Transport
     
-    class HeaderDecorator
-      def initialize(client, headers)
+    class TimeoutDecorator
+      def initialize(client, timeout)
         @client  = client
-        @headers = headers
+        @timeout = timeout
       end
       
       HTTP_VERBS.each do |verb|
         class_eval %{
-          def #{verb}(path, params = {}, headers = {}, timeout = nil)
-            @client.__send__(:#{verb}, path, params, @headers.merge(headers), timeout)
+          def #{verb}(path, params = {}, headers ={}, timeout = nil)
+            @client.__send__(:#{verb}, path, params, headers, timeout || @timeout)
           end
         }
       end

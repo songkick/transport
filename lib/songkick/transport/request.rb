@@ -10,17 +10,19 @@ module Songkick
                     :path,
                     :params,
                     :headers,
+                    :timeout,
                     :start_time,
                     :duration
       
       alias :http_method :verb
       
-      def initialize(endpoint, verb, path, params, headers = {}, start_time = nil, response = nil, error = nil)
+      def initialize(endpoint, verb, path, params, headers = {}, timeout = DEFAULT_TIMEOUT, start_time = nil, response = nil, error = nil)
         @endpoint   = endpoint
         @verb       = verb.to_s.downcase
         @path       = path
         @headers    = headers
         @params     = params
+        @timeout    = timeout
         @response   = response
         @error      = error
         @start_time = start_time || Time.now

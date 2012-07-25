@@ -23,17 +23,17 @@ module Songkick
         end
         
         def execute_request(req)
-          verb, path, params = req.verb, req.path, req.params
+          timeout = req.timeout || self.class.default_options[:timeout]
           
           response = if req.use_body?
             if req.multipart?
-              head = req.headers.merge('Content-Type'   => req.content_type)
-              self.class.__send__(verb, path, :body => req.body, :headers => head)
+              head = req.headers.merge('Content-Type' => req.content_type)
+              self.class.__send__(req.verb, req.path, :body => req.body, :headers => head, :timeout => timeout)
             else
-              self.class.__send__(verb, path, :body => req.body, :headers => req.headers)
+              self.class.__send__(req.verb, req.path, :body => req.body, :headers => req.headers, :timeout => timeout)
             end
           else
-            self.class.__send__(verb, req.url, :headers => req.headers)
+            self.class.__send__(req.verb, req.url, :headers => req.headers, :timeout => timeout)
           end
           
           process(req, response.code, response.headers, response.parsed_response)

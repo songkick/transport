@@ -30,7 +30,7 @@ module Songkick
         connection.reset
         
         connection.url = req.url
-        connection.timeout = @timeout
+        connection.timeout = req.timeout || @timeout
         connection.headers.update(req.headers)
         
         response_headers = {}

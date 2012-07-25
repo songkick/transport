@@ -6,8 +6,8 @@ module Songkick
       
       HTTP_VERBS.each do |verb|
         class_eval %{
-          def #{verb}(path, params = {}, head = {})
-            req = Request.new(endpoint, '#{verb}', path, params, headers.merge(head))
+          def #{verb}(path, params = {}, head = {}, timeout = nil)
+            req = Request.new(endpoint, '#{verb}', path, params, headers.merge(head), timeout)
             Reporting.log_request(req)
             
             response = execute_request(req)
@@ -24,6 +24,10 @@ module Songkick
       
       def with_headers(headers = {})
         HeaderDecorator.new(self, headers)
+      end
+      
+      def with_timeout(timeout = DEFAULT_TIMEOUT)
+        TimeoutDecorator.new(self, timeout)
       end
       
     private

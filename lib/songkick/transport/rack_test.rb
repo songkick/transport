@@ -21,13 +21,13 @@ module Songkick
       
       HTTP_VERBS.each do |verb|
         class_eval %{
-          def #{verb}(path, params = {}, head = {})
+          def #{verb}(path, params = {}, head = {}, timeout = nil)
             client  = Client.new(@app)
             start   = Time.now
-            request = Request.new(@app, '#{verb}', path, params, headers.merge(head), start)
+            request = Request.new(@app, '#{verb}', path, params, headers.merge(head), timeout, start)
             result  = nil
             
-            Timeout.timeout(@timeout) do
+            Timeout.timeout(timeout || @timeout) do
               request.headers.each { |key, value| client.header(key, value) }
               response = client.#{verb}(path, params)
               result = process("\#{path}, \#{params.inspect}", response.status, response.headers, response.body)
