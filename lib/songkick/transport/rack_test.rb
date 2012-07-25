@@ -40,7 +40,6 @@ module Songkick
             raise error
           
           rescue Object => error
-            p error
             logger.warn(error.message)
             raise UpstreamError, request
           end
