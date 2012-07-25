@@ -2,21 +2,24 @@ module Songkick
   module Transport
     
     class Request
-      attr_reader :endpoint,
-                  :verb,
-                  :path,
-                  :params,
-                  :start_time,
-                  :response,
-                  :error,
-                  :duration
+      attr_accessor :response,
+                    :error
+      
+      attr_reader   :endpoint,
+                    :verb,
+                    :path,
+                    :params,
+                    :headers,
+                    :start_time,
+                    :duration
       
       alias :http_method :verb
       
-      def initialize(endpoint, verb, path, params, start_time = nil, response = nil, error = nil)
+      def initialize(endpoint, verb, path, params, headers = {}, start_time = nil, response = nil, error = nil)
         @endpoint   = endpoint
         @verb       = verb.to_s.downcase
         @path       = path
+        @headers    = headers
         @params     = params
         @response   = response
         @error      = error

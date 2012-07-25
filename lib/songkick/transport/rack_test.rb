@@ -5,8 +5,14 @@ module Songkick
   module Transport
     
     class RackTest < Base
-      include Rack::Test::Methods
-      attr_reader :app
+      class Client
+        attr_reader :app
+        include Rack::Test::Methods
+        
+        def initialize(app)
+          @app = app
+        end
+      end
       
       def initialize(app, options = {})
         @app     = app
@@ -15,24 +21,28 @@ module Songkick
       
       HTTP_VERBS.each do |verb|
         class_eval %{
-          def #{verb}(path, params = {})
-            start = Time.now
-            result = nil
+          def #{verb}(path, params = {}, head = {})
+            client  = Client.new(@app)
+            start   = Time.now
+            request = Request.new(@app, '#{verb}', path, params, headers.merge(head), start)
+            result  = nil
             
             Timeout.timeout(@timeout) do
-              response = super
+              request.headers.each { |key, value| client.header(key, value) }
+              response = client.#{verb}(path, params)
               result = process("\#{path}, \#{params.inspect}", response.status, response.headers, response.body)
-              Reporting.record(@app, "#{verb}", path, params, start, result)
+              Reporting.record(request, result)
               result
             end
 
           rescue UpstreamError => error
-            Reporting.record(@app, "#{verb}", path, params, start, nil, error)
+            Reporting.record(request, nil, error)
             raise error
           
           rescue Object => error
+            p error
             logger.warn(error.message)
-            raise UpstreamError, Request.new(@app, "#{verb}", path, params)
+            raise UpstreamError, request
           end
         }
       end

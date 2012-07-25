@@ -20,6 +20,12 @@ class TestApp < Sinatra::Base
     '}'
   end
   
+  get '/authenticate' do
+    env['HTTP_AUTHORIZATION'] ?
+        Yajl::Encoder.encode('successful' => true) :
+        Yajl::Encoder.encode('successful' => false)
+  end
+  
   get '/artists/:id' do
     Yajl::Encoder.encode('id' => params[:id].to_i)
   end

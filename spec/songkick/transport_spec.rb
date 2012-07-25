@@ -43,6 +43,19 @@ describe Songkick::Transport do
       end
     end
     
+    describe :with_headers do
+      it "adds the given headers to requests" do
+        data = transport.with_headers("Authorization" => "correct password").get("/authenticate").data
+        data.should == {"successful" => true}
+      end
+      
+      it "does not affect requests made directly on the transport object" do
+        transport.with_headers("Authorization" => "correct password").get("/authenticate")
+        data = transport.get("/authenticate").data
+        data.should == {"successful" => false}
+      end
+    end
+    
     describe :post do
       it "sends data using POST" do
         data = transport.post("/artists", :name => "Amon Tobin").data

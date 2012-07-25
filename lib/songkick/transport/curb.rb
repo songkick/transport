@@ -31,7 +31,7 @@ module Songkick
         
         connection.url = req.url
         connection.timeout = @timeout
-        connection.headers.update(headers)
+        connection.headers.update(req.headers)
         
         response_headers = {}
         

@@ -6,9 +6,9 @@ module Songkick
         Report.new
       end
       
-      def self.record(*args)
+      def self.record(request, response, error = nil)
         return unless report = Thread.current[:songkick_transport_report]
-        report.record(*args)
+        report.record(request, response, error)
       end
       
       def self.log_request(request)
@@ -43,8 +43,10 @@ module Songkick
           Thread.current[:songkick_transport_report] = nil
         end
         
-        def record(*args)
-          @requests << Request.new(*args)
+        def record(request, response, error)
+          request.response = response
+          request.error = error
+          @requests << request
         end
         
         def total_duration

@@ -27,13 +27,13 @@ module Songkick
           
           response = if req.use_body?
             if req.multipart?
-              head = headers.merge('Content-Type'   => req.content_type)
+              head = req.headers.merge('Content-Type'   => req.content_type)
               self.class.__send__(verb, path, :body => req.body, :headers => head)
             else
-              self.class.__send__(verb, path, :body => req.body, :headers => headers)
+              self.class.__send__(verb, path, :body => req.body, :headers => req.headers)
             end
           else
-            self.class.__send__(verb, req.url, :headers => headers)
+            self.class.__send__(verb, req.url, :headers => req.headers)
           end
           
           process(req, response.code, response.headers, response.parsed_response)

@@ -6,20 +6,24 @@ module Songkick
       
       HTTP_VERBS.each do |verb|
         class_eval %{
-          def #{verb}(path, params = {})
-            req = Request.new(endpoint, '#{verb}', path, params)
+          def #{verb}(path, params = {}, head = {})
+            req = Request.new(endpoint, '#{verb}', path, params, headers.merge(head))
             Reporting.log_request(req)
             
             response = execute_request(req)
             
             Reporting.log_response(response, req)
-            Reporting.record(endpoint, '#{verb}', path, params, req.start_time, response)
+            Reporting.record(req, response)
             response
           rescue => error
-            Reporting.record(endpoint, '#{verb}', path, params, req.start_time, nil, error)
+            Reporting.record(req, nil, error)
             raise error
           end
         }
+      end
+      
+      def with_headers(headers = {})
+        HeaderDecorator.new(self, headers)
       end
       
     private
