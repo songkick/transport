@@ -161,6 +161,10 @@ multiple requests:
     auth.get('/me')
     auth.put('/users/99', :username => 'bob')
 
+Note that +with_headers+ will normalize Rack-style headers for easy forwarding
+of input from the front end. For example, +HTTP_USER_AGENT+ is converted to
+<tt>User-Agent</tt> in the outgoing request.
+
 Similarly, the request timeout can be adjusted per-request:
 
     client.with_timeout(10).get('/slow_resource')

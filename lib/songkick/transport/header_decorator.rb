@@ -4,7 +4,7 @@ module Songkick
     class HeaderDecorator
       def initialize(client, headers)
         @client  = client
-        @headers = headers
+        @headers = Headers.new(headers)
       end
       
       HTTP_VERBS.each do |verb|

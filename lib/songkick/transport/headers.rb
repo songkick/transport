@@ -19,6 +19,10 @@ module Songkick
         @hash[self.class.normalize(header_name)]
       end
       
+      def merge(hash)
+        @hash.merge(hash)
+      end
+      
       def self.normalize(header_name)
         header_name.
             gsub(/^HTTP_/, '').gsub('_', '-').

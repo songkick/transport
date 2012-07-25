@@ -49,6 +49,11 @@ describe Songkick::Transport do
         data.should == {"successful" => true}
       end
       
+      it "reformats Rack-style headers" do
+        data = transport.with_headers("HTTP_AUTHORIZATION" => "correct password").get("/authenticate").data
+        data.should == {"successful" => true}
+      end
+      
       it "does not affect requests made directly on the transport object" do
         transport.with_headers("Authorization" => "correct password").get("/authenticate")
         data = transport.get("/authenticate").data
