@@ -253,6 +253,11 @@ This method accepts both strings and regexes. Any parameter name (as serialized
 in a query string) that matches one of these will be logged as e.g.
 <tt>password=[REMOVED]</tt>.
 
+It also sanitizes custom headers that are put in the logs, so you might want to
+exclude headers used for authentication:
+
+    Songkick::Transport.sanitize /Authorization/i, /Cookie/i
+
 There is also a more advanced reporting system that lets you aggregate request
 statistics. During a request to a web application, many requests to backend
 services may be involved. The repoting system lets you collect information about

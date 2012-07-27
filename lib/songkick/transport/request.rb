@@ -63,6 +63,10 @@ module Songkick
       def to_s
         url = Serialization.build_url(@verb, @endpoint, @path, @params, true)
         command = "#{@verb.upcase} '#{url}'"
+        @headers.each do |key, value|
+          value = Serialization::SANITIZED_VALUE if Serialization.sanitize?(key)
+          command << " -H '#{key}: #{value}'"
+        end
         return command unless use_body?
         query = Serialization.build_query_string(params, true, true)
         command << " -H 'Content-Type: #{content_type}'"

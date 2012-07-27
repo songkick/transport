@@ -16,9 +16,7 @@ module Songkick
       def build_query_string(params, fully_encode = true, sanitize = false)
         pairs = []
         each_qs_param('', params) do |key, value|
-          if sanitize and sanitize?(key)
-            value = SANITIZED_VALUE
-          end
+          value = SANITIZED_VALUE if sanitize and sanitize?(key)
           pairs << [key, value]
         end
         if fully_encode
