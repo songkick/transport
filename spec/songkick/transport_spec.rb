@@ -59,6 +59,11 @@ describe Songkick::Transport do
         data = transport.get("/authenticate").data
         data.should == {"successful" => false}
       end
+      
+      it "can set Content-Type" do
+        data = transport.with_headers("Content-Type" => "application/json").post("/content").data
+        data.should == {"type" => "application/json"}
+      end
     end
     
     describe :post do

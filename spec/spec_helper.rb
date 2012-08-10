@@ -34,6 +34,10 @@ class TestApp < Sinatra::Base
     Yajl::Encoder.encode('id' => 'new', 'name' => params[:name].upcase)
   end
   
+  post '/content' do
+    Yajl::Encoder.encode('type' => env['CONTENT_TYPE'])
+  end
+  
   put '/artists/:id' do
     name = params[:name] || CGI.parse(env['rack.input'].read)['name'].first || ''
     Yajl::Encoder.encode('id' => params[:id].to_i, 'name' => name.downcase)
