@@ -6,7 +6,7 @@ get '/' do
 end
 
 get '/slow' do
-  sleep 60
+  sleep 3
   '{"helloooooo":"world"}'
 end
 

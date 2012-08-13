@@ -7,16 +7,18 @@ module Songkick
       HTTP_VERBS.each do |verb|
         class_eval %{
           def #{verb}(path, params = {}, head = {}, timeout = nil)
-            req = Request.new(endpoint, '#{verb}', path, params, headers.merge(head), timeout, Time.now)
+            req = Request.new(endpoint, '#{verb}', path, params, headers.merge(head), timeout)
             Reporting.log_request(req)
             
-            response = execute_request(req)
+            req.response = execute_request(req)
             
-            Reporting.log_response(response, req)
-            Reporting.record(req, response)
-            response
+            Reporting.log_response(req)
+            Reporting.record(req)
+            req.response
+            
           rescue => error
-            Reporting.record(req, nil, error)
+            req.error = error
+            Reporting.record(req)
             raise error
           end
         }

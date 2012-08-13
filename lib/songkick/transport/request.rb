@@ -2,9 +2,6 @@ module Songkick
   module Transport
     
     class Request
-      attr_accessor :response,
-                    :error
-      
       attr_reader   :endpoint,
                     :verb,
                     :path,
@@ -12,22 +9,35 @@ module Songkick
                     :headers,
                     :timeout,
                     :start_time,
-                    :duration
+                    :response,
+                    :error
       
       alias :http_method :verb
       
-      def initialize(endpoint, verb, path, params, headers = {}, timeout = DEFAULT_TIMEOUT, start_time = nil, response = nil, error = nil)
+      def initialize(endpoint, verb, path, params, headers = {}, timeout = DEFAULT_TIMEOUT)
         @endpoint   = endpoint
         @verb       = verb.to_s.downcase
         @path       = path
         @headers    = headers
         @params     = params
         @timeout    = timeout
-        @response   = response
-        @error      = error
         @start_time = start_time || Time.now
-        @duration   = (Time.now.to_f - start_time.to_f) * 1000
         @multipart  = Serialization.multipart?(params)
+      end
+      
+      def response=(response)
+        @response = response
+        @end_time = Time.now
+      end
+      
+      def error=(error)
+        @error = error
+        @end_time = Time.now
+      end
+      
+      def duration
+        return nil unless @end_time
+        (@end_time.to_f - @start_time.to_f) * 1000
       end
       
       def use_body?
@@ -61,7 +71,10 @@ module Songkick
       end
       
       def to_s
-        url = Serialization.build_url(@verb, @endpoint, @path, @params, true)
+        url = String === @endpoint ?
+              Serialization.build_url(@verb, @endpoint, @path, @params, true) :
+              @endpoint.to_s
+        
         command = "#{@verb.upcase} '#{url}'"
         @headers.each do |key, value|
           value = Serialization::SANITIZED_VALUE if Serialization.sanitize?(key)

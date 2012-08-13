@@ -6,9 +6,9 @@ module Songkick
         Report.new
       end
       
-      def self.record(request, response, error = nil)
+      def self.record(request)
         return unless report = Thread.current[:songkick_transport_report]
-        report.record(request, response, error)
+        report << request
       end
       
       def self.log_request(request)
@@ -16,8 +16,9 @@ module Songkick
         logger.info(request.to_s)
       end
       
-      def self.log_response(response, request)
+      def self.log_response(request)
         return unless Transport.verbose?
+        response = request.response
         duration = (Time.now.to_f - request.start_time.to_f) * 1000
         logger.info "Response status: #{response.status}, duration: #{duration.ceil}ms"
         logger.debug "Response data: #{response.data.inspect}"
@@ -30,7 +31,7 @@ module Songkick
       class Report
         include Enumerable
         extend Forwardable
-        def_delegators :@requests, :each, :first, :last, :length, :size, :[]
+        def_delegators :@requests, :each, :first, :last, :length, :size, :[], :<<
         
         def initialize
           @requests = []
@@ -41,12 +42,6 @@ module Songkick
           yield
         ensure
           Thread.current[:songkick_transport_report] = nil
-        end
-        
-        def record(request, response, error)
-          request.response = response
-          request.error = error
-          @requests << request
         end
         
         def total_duration

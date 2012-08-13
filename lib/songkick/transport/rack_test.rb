@@ -24,19 +24,20 @@ module Songkick
           def #{verb}(path, params = {}, head = {}, timeout = nil)
             client  = Client.new(@app)
             start   = Time.now
-            request = Request.new(@app, '#{verb}', path, params, headers.merge(head), timeout, start)
+            request = Request.new(@app, '#{verb}', path, params, headers.merge(head), timeout)
             result  = nil
             
             Timeout.timeout(timeout || @timeout) do
               request.headers.each { |key, value| client.header(key, value) }
               response = client.#{verb}(path, params)
-              result = process("\#{path}, \#{params.inspect}", response.status, response.headers, response.body)
-              Reporting.record(request, result)
-              result
+              request.response = process("\#{path}, \#{params.inspect}", response.status, response.headers, response.body)
+              Reporting.record(request)
+              request.response
             end
 
           rescue UpstreamError => error
-            Reporting.record(request, nil, error)
+            request.error = error
+            Reporting.record(request)
             raise error
           
           rescue Object => error
