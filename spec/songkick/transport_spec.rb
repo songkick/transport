@@ -79,6 +79,11 @@ describe Songkick::Transport do
       it "can send hash params" do
         transport.post("/", :list => {:a => "b"}).data.should == {"list" => {"a" => "b"}}
       end
+
+      it "can send a raw body" do
+        response = transport.with_headers("Content-Type" => "text/plain").post("/process", "Hello, world!")
+        response.data.should == {"body" => "Hello, world!", "type" => "text/plain"}
+      end
       
       it "raises an UpstreamError for a PUT resource" do
         lambda { transport.post("/artists/64") }.should raise_error(Songkick::Transport::UpstreamError)

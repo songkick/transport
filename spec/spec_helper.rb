@@ -42,6 +42,10 @@ class TestApp < Sinatra::Base
     name = params[:name] || CGI.parse(env['rack.input'].read)['name'].first || ''
     Yajl::Encoder.encode('id' => params[:id].to_i, 'name' => name.downcase)
   end
+
+  post '/process' do
+    Yajl::Encoder.encode('body' => request.body.read, 'type' => request.env['CONTENT_TYPE'])
+  end
   
   %w[post put].each do |verb|
     __send__(verb, '/upload') do
