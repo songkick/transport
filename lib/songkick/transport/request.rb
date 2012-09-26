@@ -2,15 +2,15 @@ module Songkick
   module Transport
     
     class Request
-      attr_reader   :endpoint,
-                    :verb,
-                    :path,
-                    :params,
-                    :headers,
-                    :timeout,
-                    :start_time,
-                    :response,
-                    :error
+      attr_reader :endpoint,
+                  :verb,
+                  :path,
+                  :params,
+                  :headers,
+                  :timeout,
+                  :start_time,
+                  :response,
+                  :error
       
       alias :http_method :verb
       
