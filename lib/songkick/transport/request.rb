@@ -6,7 +6,6 @@ module Songkick
                   :verb,
                   :path,
                   :params,
-                  :headers,
                   :timeout,
                   :start_time,
                   :response,
@@ -18,11 +17,15 @@ module Songkick
         @endpoint   = endpoint
         @verb       = verb.to_s.downcase
         @path       = path
-        @headers    = headers
+        @headers    = Headers.new(headers)
         @params     = params
         @timeout    = timeout
         @start_time = start_time || Time.now
         @multipart  = Serialization.multipart?(params)
+        
+        if use_body?
+          @headers['Content-Type'] ||= @multipart ? multipart_request[:content_type] : FORM_ENCODING
+        end
       end
       
       def response=(response)
@@ -40,21 +43,16 @@ module Songkick
         (@end_time.to_f - @start_time.to_f) * 1000
       end
       
+      def headers
+        @headers.to_hash
+      end
+      
       def use_body?
         USE_BODY.include?(@verb)
       end
       
       def multipart?
         @multipart
-      end
-      
-      def content_type
-        return nil unless use_body?
-        if @multipart
-          multipart_request[:content_type]
-        else
-          'application/x-www-form-urlencoded'
-        end
       end
       
       def body
@@ -82,7 +80,6 @@ module Songkick
         end
         return command unless use_body?
         query = Serialization.build_query_string(params, true, true)
-        command << " -H 'Content-Type: #{content_type}'"
         command << " -d '#{query}'"
         command
       end

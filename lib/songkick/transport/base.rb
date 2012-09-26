@@ -39,10 +39,10 @@ module Songkick
       end
       
       def headers
-        {
+        Headers.new(
           'Connection' => 'close',
           'User-Agent' => user_agent || ''
-        }
+        )
       end
       
       def logger

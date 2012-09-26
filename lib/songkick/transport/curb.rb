@@ -45,7 +45,6 @@ module Songkick
         end
         
         if req.use_body?
-          connection.headers['Content-Type'] ||= req.content_type
           connection.__send__("http_#{req.verb}", req.body)
         else
           connection.__send__("http_#{req.verb}")

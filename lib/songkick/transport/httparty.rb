@@ -26,12 +26,7 @@ module Songkick
           timeout = req.timeout || self.class.default_options[:timeout]
           
           response = if req.use_body?
-            if req.multipart?
-              head = req.headers.merge('Content-Type' => req.content_type)
-              self.class.__send__(req.verb, req.path, :body => req.body, :headers => head, :timeout => timeout)
-            else
-              self.class.__send__(req.verb, req.path, :body => req.body, :headers => req.headers, :timeout => timeout)
-            end
+            self.class.__send__(req.verb, req.path, :body => req.body, :headers => req.headers, :timeout => timeout)
           else
             self.class.__send__(req.verb, req.url, :headers => req.headers, :timeout => timeout)
           end

@@ -9,8 +9,9 @@ module Songkick
     DEFAULT_TIMEOUT = 5
     DEFAULT_FORMAT  = :json
     
-    HTTP_VERBS = %w[get post put delete head]
-    USE_BODY   = %w[post put]
+    HTTP_VERBS    = %w[get post put delete head]
+    USE_BODY      = %w[post put]
+    FORM_ENCODING = 'application/x-www-form-urlencoded'
     
     ROOT = File.expand_path('..', __FILE__)
     
