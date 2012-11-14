@@ -5,6 +5,12 @@ module Songkick
   module Transport
 
     class Curb < Base
+      # Send this so that curb will not implement Section 8.2.3 of RFC 2616,
+      # which our Ruby HTTP servers are not equipped to respond to. (If not
+      # sent it causes an additional 1s of latency for all requests with post
+      # data longer than 1k)
+      DEFAULT_HEADERS = {"Expect" => ""}
+
       def self.clear_thread_connection
          Thread.current[:transport_curb_easy] = nil
       end
@@ -31,7 +37,7 @@ module Songkick
         
         connection.url = req.url
         connection.timeout = req.timeout || @timeout
-        connection.headers.update(req.headers)
+        connection.headers.update(DEFAULT_HEADERS.merge(req.headers))
         
         response_headers = {}
         
