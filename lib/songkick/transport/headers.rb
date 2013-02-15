@@ -19,6 +19,7 @@ module Songkick
       def initialize(hash = {})
         @hash = {}
         hash.each do |key, value|
+          next if value.nil?
           @hash[self.class.normalize(key)] = value
         end
       end

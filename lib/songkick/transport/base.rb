@@ -41,7 +41,7 @@ module Songkick
       def headers
         Headers.new(
           'Connection' => 'close',
-          'User-Agent' => user_agent || ''
+          'User-Agent' => user_agent
         )
       end
       
