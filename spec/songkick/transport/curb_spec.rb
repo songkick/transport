@@ -17,7 +17,7 @@ module Songkick
           @headers = {}
         end
         
-        def http_get
+        def http(verb)
           raise(@error, "bang") if @error
         end
         

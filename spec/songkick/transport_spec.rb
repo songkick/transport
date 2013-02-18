@@ -66,6 +66,13 @@ describe Songkick::Transport do
       end
     end
     
+    describe :options do
+      it "sends an OPTIONS request" do
+        response = transport.options("/.well-known/host-meta")
+        response.headers["Access-Control-Allow-Methods"].should == "GET, PUT, DELETE"
+      end
+    end
+
     describe :post do
       it "sends data using POST" do
         data = transport.post("/artists", :name => "Amon Tobin").data

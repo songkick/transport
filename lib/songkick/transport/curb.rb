@@ -53,7 +53,7 @@ module Songkick
         if req.use_body?
           connection.__send__("http_#{req.verb}", req.body)
         else
-          connection.__send__("http_#{req.verb}")
+          connection.http(req.verb.upcase)
         end
 
         process(req, connection.response_code, response_headers, connection.body_str)

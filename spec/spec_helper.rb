@@ -29,6 +29,11 @@ class TestApp < Sinatra::Base
   get '/artists/:id' do
     Yajl::Encoder.encode('id' => params[:id].to_i)
   end
+
+  options '/.well-known/host-meta' do
+    headers 'Access-Control-Allow-Methods' => 'GET, PUT, DELETE'
+    ''
+  end
   
   post '/artists' do
     Yajl::Encoder.encode('id' => 'new', 'name' => params[:name].upcase)
