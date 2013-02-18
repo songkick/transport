@@ -20,7 +20,9 @@ We currently support three backends:
 * Talking HTTP with {HTTParty}[http://httparty.rubyforge.org/]
 * Talking directly to a {Rack}[http://rack.rubyforge.org/] app with Rack::Test
 
-It is assumed all service applications speak JSON as their serialization format.
+If the service you're talking to returns <tt>Content-Type: application/json</tt>,
+we automatically parse the response for you. You can register parsers for other
+content types as describe below.
 
 
 == Using the transports
@@ -94,10 +96,9 @@ This library was primarily developed to talk to Songkick's backend services, and
 as such adopts some conventions that put it at a higher level of abstraction
 than a vanilla HTTP client.
 
-It assumes successful responses will all contain JSON data. A response object
-has the following properties:
+A response object has the following properties:
 
-* +data+ -- the result of parsing the body as JSON
+* +data+ -- the result of parsing the body according to its content-type
 * +headers+ -- a read-only hash-like object containing response headers
 * +status+ -- the response's status code
 
@@ -125,6 +126,17 @@ If the request raises an exception, it will be of one of the following types:
   invalid JSON
 * <tt>Songkick::Transport::HttpError</tt> -- we received a response with a
   non-successful status code, e.g. 404 or 500
+
+
+=== Registering response parsers
+
+<tt>Songkick::Transport</tt> automatically sets <tt>response.data</tt> if the
+content-type of the response is <tt>application/json</tt>. You can register
+parsers for other content-types like so:
+
+    Songkick::Transport.register_parser('application/yaml', YAML)
+
+The parser object you register must respond to <tt>parse(string)</tt>.
 
 
 === Nested parameters

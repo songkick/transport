@@ -6,7 +6,7 @@ describe Songkick::Transport::Response do
   end
   
   describe "200 with a body" do
-    let(:response) { process("", 200, {}, '{"hello":"world"}') }
+    let(:response) { process("", 200, {"Content-Type" => "application/json; charset=utf-8"}, '{"hello":"world"}') }
     
     it "is an OK" do
       response.should be_a(Songkick::Transport::Response::OK)
@@ -18,7 +18,7 @@ describe Songkick::Transport::Response do
   end
   
   describe "200 with a body with an empty line in it" do
-    let(:response) { process("", 200, {}, "{\"hello\":\"world\"\n\n}") }
+    let(:response) { process("", 200, {"Content-Type" => "application/json"}, "{\"hello\":\"world\"\n\n}") }
     
     it "is an OK" do
       response.should be_a(Songkick::Transport::Response::OK)
@@ -30,7 +30,7 @@ describe Songkick::Transport::Response do
   end
   
   describe "200 with a parsed body" do
-    let(:response) { process("", 200, {}, {"hello" => "world"}) }
+    let(:response) { process("", 200, {"Content-Type" => "application/json"}, {"hello" => "world"}) }
     
     it "exposes its data" do
       response.data.should == {"hello" => "world"}
@@ -62,7 +62,7 @@ describe Songkick::Transport::Response do
   end
   
   describe "409 with a body" do
-    let(:response) { process("", 409, {}, '{"errors":[]}') }
+    let(:response) { process("", 409, {"Content-Type" => "application/json"}, '{"errors":[]}') }
     
     it "is a UserError" do
       response.should be_a(Songkick::Transport::Response::UserError)

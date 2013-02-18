@@ -33,6 +33,21 @@ module Songkick
     autoload :ConnectionFailedError,ROOT + '/transport/upstream_error'
     autoload :InvalidJSONError,     ROOT + '/transport/upstream_error'
     autoload :HttpError,            ROOT + '/transport/http_error'
+
+    def self.regsiter_parser(content_type, parser)
+      @parsers ||= {}
+      @parsers[content_type] = parser
+    end
+
+    def self.parser_for(content_type)
+      parser = @parsers && @parsers[content_type]
+      unless parser
+        raise TypeError, "Could not find a parser for content-type: #{content_type}"
+      end
+      parser
+    end
+
+    regsiter_parser 'application/json', Yajl::Parser
     
     IO = UploadIO
     

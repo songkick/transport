@@ -16,15 +16,19 @@ module Songkick
         Transport.logger.warn "Request returned invalid JSON: #{request}"
         raise Transport::InvalidJSONError, request
       end
+
+      def self.parse(body, content_type)
+        return body unless body.is_a?(String)
+        return nil if body.strip == ''
+
+        content_type = (content_type || '').split(/\s*;\s*/).first
+        Transport.parser_for(content_type).parse(body)
+      end
       
       attr_reader :data, :headers, :status
       
       def initialize(status, headers, body)
-        @data = if body.is_a?(String)
-                  body.strip == '' ? nil : Yajl::Parser.parse(body)
-                else
-                  body
-                end
+        @data = Response.parse(body, headers['Content-Type'])
         
         @headers = Headers.new(headers)
         @status  = status.to_i
