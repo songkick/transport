@@ -25,11 +25,11 @@ module Songkick
         Transport.parser_for(content_type).parse(body)
       end
       
-      attr_reader :data, :headers, :status
+      attr_reader :body, :data, :headers, :status
       
       def initialize(status, headers, body)
-        @data = Response.parse(body, headers['Content-Type'])
-        
+        @body    = body
+        @data    = Response.parse(body, headers['Content-Type'])
         @headers = Headers.new(headers)
         @status  = status.to_i
       end
