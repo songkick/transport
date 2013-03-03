@@ -31,7 +31,7 @@ Let's say you're running a {Sinatra}[http://www.sinatrarb.com/] application that
 exposes some JSON:
 
     require 'sinatra'
-
+    
     get '/ohai' do
       '{"hello":"world"}'
     end
@@ -41,14 +41,14 @@ request:
 
     require 'songkick/transport'
     Transport = Songkick::Transport::Curb
-
+    
     client = Transport.new('http://localhost:4567',
                            :user_agent => 'Test Agent',
                            :timeout    => 5)
-
+    
     response = client.get('/ohai')
     # => Songkick::Transport::Response::OK
-
+    
     response.data
     # => {"hello" => "world"}
 
@@ -58,7 +58,7 @@ takes a reference to a Rack application, for example:
 
     require 'songkick/transport'
     Transport = Songkick::Transport::RackTest
-
+    
     client = Transport.new(Sinatra::Application,
                            :user_agent => 'Test Agent',
                            :timeout    => 5)
@@ -79,7 +79,7 @@ The response's headers are exposed through the +headers+ method, which is an
 immutable hash-like object that normalizes various header conventions.
 
     response = client.get('/users')
-
+    
     # These all return 'application/json'
     response.headers['Content-Type']
     response.headers['content-type']
@@ -104,14 +104,8 @@ A response object has the following properties:
 
 Only responses with status codes, 200 (OK), 201 (Created), 204 (No Content), and
 409 (Conflict) yield response objects. All other status codes cause an exception
-to be raised.
-
-We use 409 to indicate user error, i.e. input validation errors as
-opposed to software/infrastructure errors. If the response body contains an
-hash in the format <tt>{ "errors":["message"] }</tt>, these errors will be
-available as <tt>response.errors<tt>.
-
-The response object is typed for the
+to be raised. We use 409 to indicate user error, i.e. input validation errors as
+opposed to software/infrastructure errors. The response object is typed for the
 status code; the possible types are:
 
 * 200: <tt>Songkick::Transport::Response::OK</tt>
@@ -132,9 +126,9 @@ If the request raises an exception, it will be of one of the following types:
   invalid JSON
 * <tt>Songkick::Transport::HttpError</tt> -- we received a response with a
   non-successful status code, e.g. 404 or 500
-
+  
 It is possible to customise the status codes which are treated as UserError
-when initializing the client. Requests responding with any of the provided
+when initializing the client. Requests responding with any of the provided 
 status codes will then yield a response object with error details, rather than
 raising an exception;
 
@@ -231,7 +225,7 @@ params look like:
         :date => "2012-03-01"
       }
     }
-
+    
     file = params[:inventory][:file]
     io = Songkick::Transport::IO.new(file[:tempfile], file[:type], file[:filename])
 
@@ -244,7 +238,7 @@ what you need. The params look like this:
         "date" => "2012-03-01"
       }
     }
-
+    
     file = params["inventory"]["file"]
     io = Songkick::Transport::IO.new(file, file.content_type, file.original_filename)
 
@@ -293,7 +287,7 @@ can use it to create a logging middleware:
       def initialize(app)
         @app = app
       end
-
+      
       def call(env)
         report = Songkick::Transport.report
         response = report.execute { @app.call(env) }
