@@ -126,7 +126,14 @@ If the request raises an exception, it will be of one of the following types:
   invalid JSON
 * <tt>Songkick::Transport::HttpError</tt> -- we received a response with a
   non-successful status code, e.g. 404 or 500
+  
+It is possible to customise the status codes which are treated as UserError
+when initializing the client. Requests responding with any of the provided 
+status codes will then yield a response object with error details, rather than
+raising an exception;
 
+    client = Transport.new('http://localhost:4567',
+                           :error_status_codes => [409, 422])
 
 === Registering response parsers
 
