@@ -8,6 +8,7 @@ module Songkick
   module Transport
     DEFAULT_TIMEOUT = 5
     DEFAULT_FORMAT  = :json
+    DEFAULT_ERROR_STATUS_CODES = [409]
     
     HTTP_VERBS    = %w[options head get patch post put delete head]
     USE_BODY      = %w[post put]
@@ -34,7 +35,7 @@ module Songkick
     autoload :InvalidJSONError,     ROOT + '/transport/upstream_error'
     autoload :HttpError,            ROOT + '/transport/http_error'
 
-    def self.regsiter_parser(content_type, parser)
+    def self.register_parser(content_type, parser)
       @parsers ||= {}
       @parsers[content_type] = parser
     end
@@ -47,7 +48,7 @@ module Songkick
       parser
     end
 
-    regsiter_parser 'application/json', Yajl::Parser
+    register_parser 'application/json', Yajl::Parser
     
     IO = UploadIO
     

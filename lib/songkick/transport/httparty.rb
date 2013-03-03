@@ -12,6 +12,9 @@ module Songkick
         
         transport = klass.new
         transport.user_agent = options[:user_agent]
+        
+        transport.set_error_status_codes_from(options)
+        
         transport
       end
       
@@ -55,7 +58,7 @@ module Songkick
         end
       end
     end
-    
+
   end
 end
 

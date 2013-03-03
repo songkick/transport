@@ -72,5 +72,17 @@ describe Songkick::Transport::Response do
       response.errors.should == []
     end
   end
+  
+  context "with custom error status codes" do
+    let(:response) { process("", 422, {"Content-Type" => "application/json"}, '{"errors":[]}', [409, 422]) }
+    
+    it "is a UserError" do
+      response.should be_a(Songkick::Transport::Response::UserError)
+    end
+    
+    it "exposes the errors" do
+      response.errors.should == []
+    end
+  end
 end
 
