@@ -10,7 +10,8 @@ and serialization details. It transparently deals with parameter serialization,
 including the following:
 
 * Correctly CGI-escaping any data you pass in
-* Nested parameters, e.g. <tt>'foo' => {'bar' => 'qux'}</tt>
+* Nested parameters, e.g. <tt>'foo' => {'a' => 'b', 'c' => 'd'}</tt> becomes
+  <tt>foo[a]=b&foo[c]=d</tt>
 * File uploads and multipart requests
 * Entity body for POST/PUT, query string for everything else
 
@@ -22,7 +23,7 @@ We currently support three backends:
 
 If the service you're talking to returns <tt>Content-Type: application/json</tt>,
 we automatically parse the response for you. You can register parsers for other
-content types as describe below.
+content types as described below.
 
 
 == Using the transports
@@ -33,6 +34,7 @@ exposes some JSON:
     require 'sinatra'
     
     get '/ohai' do
+      headers 'Content-Type' => 'application/json'
       '{"hello":"world"}'
     end
 
@@ -98,6 +100,7 @@ than a vanilla HTTP client.
 
 A response object has the following properties:
 
+* +body+ -- the raw response body
 * +data+ -- the result of parsing the body according to its content-type
 * +headers+ -- a read-only hash-like object containing response headers
 * +status+ -- the response's status code
@@ -309,7 +312,7 @@ the total time spent calling backend services during the block.
 
 The MIT License
 
-Copyright (c) 2012 Songkick
+Copyright (c) 2012-2013 Songkick
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
