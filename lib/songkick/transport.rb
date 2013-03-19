@@ -9,7 +9,7 @@ module Songkick
     DEFAULT_TIMEOUT = 5
     DEFAULT_FORMAT  = :json
     
-    HTTP_VERBS    = %w[options head get patch post put delete head]
+    HTTP_VERBS    = %w[options head get patch post put delete]
     USE_BODY      = %w[post put]
     FORM_ENCODING = 'application/x-www-form-urlencoded'
     

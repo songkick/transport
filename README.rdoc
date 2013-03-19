@@ -67,8 +67,9 @@ takes a reference to a Rack application, for example:
 
 All transports expose exactly the same instance methods.
 
-The client supports the +get+, +post+, +put+, +delete+ and +head+ methods,
-which all take a path and an optional +Hash+ of parameters, for example:
+The client supports the +delete+, +get+, +head+, +patch+, +post+, +put+ and
++options+ methods, which all take a path and an optional +Hash+ of parameters,
+for example:
 
     client.post('/users', :username => 'bob', :password => 'foo')
 
