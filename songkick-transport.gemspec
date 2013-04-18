@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name              = "songkick-transport"
-  s.version           = "0.2.0"
+  s.version           = "0.2.1"
   s.summary           = "HTTP client abstraction for service clients"
   s.author            = "James Coglan"
   s.email             = "james@songkick.com"
