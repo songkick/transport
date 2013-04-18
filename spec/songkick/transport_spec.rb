@@ -119,7 +119,7 @@ describe Songkick::Transport do
       let(:upload) { Songkick::Transport::IO.new(file, "image/jpeg", "songkick.png") }
       
       let :params do
-        {:concert => {:file => upload, :foo => :bar}}
+        {:concert => {:file => upload, :foo => "me@thing.com"}}
       end
       
       let :expected_response do
@@ -127,7 +127,7 @@ describe Songkick::Transport do
           "filename" => "songkick.png",
           "method"   => @http_method,
           "size"     => 6694,
-          "foo"      => "bar"
+          "foo"      => "me@thing.com"
         }
       end
       

@@ -16,7 +16,7 @@ module Songkick
       def build_query_string(params, fully_encode = true, sanitize = false)
         return params if String === params
         pairs = []
-        each_qs_param('', params) do |key, value|
+        each_qs_param('', params, fully_encode) do |key, value|
           value = SANITIZED_VALUE if sanitize and sanitize?(key)
           pairs << [key, value]
         end
@@ -30,19 +30,21 @@ module Songkick
         end
       end
       
-      def each_qs_param(prefix, value, &block)
+      def each_qs_param(prefix, value, fully_encode = true, &block)
         case value
         when Array
-          value.each { |e| each_qs_param(prefix + "[]", e, &block) }
+          value.each { |e| each_qs_param(prefix + "[]", e, fully_encode, &block) }
         when Hash
           value.each do |k,v|
-            key = (prefix == '') ? CGI.escape(k.to_s) : prefix + "[#{CGI.escape k.to_s}]"
-            each_qs_param(key, v, &block)
+            encoded = fully_encode ? CGI.escape(k.to_s) : k.to_s
+            key = (prefix == '') ? encoded : prefix + "[#{encoded}]"
+            each_qs_param(key, v, fully_encode, &block)
           end
         when Transport::IO
           block.call(prefix, value)
         else
-          block.call(prefix, CGI.escape(value.to_s))
+          encoded = fully_encode ? CGI.escape(value.to_s) : value.to_s
+          block.call(prefix, encoded)
         end
       end
       
