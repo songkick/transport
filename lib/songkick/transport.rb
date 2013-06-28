@@ -26,6 +26,7 @@ module Songkick
     autoload :Request,          ROOT + '/transport/request'
     autoload :Response,         ROOT + '/transport/response'
     autoload :TimeoutDecorator, ROOT + '/transport/timeout_decorator'
+    autoload :Service,          ROOT + '/transport/service'
 
     autoload :UpstreamError,        ROOT + '/transport/upstream_error'
     autoload :HostResolutionError,  ROOT + '/transport/upstream_error'

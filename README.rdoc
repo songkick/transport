@@ -308,6 +308,32 @@ following API:
 The +report+ object itself also responds to +total_duration+, which gives you
 the total time spent calling backend services during the block.
 
+== Writing Service classes
+
++Songkick::Transport::Service+ is a class to make writing service clients more convenient.
+
+Set up config globally (perhaps in a Rails initializer):
+
+    Songkick::Transport::Service.set_endpoints("blah-service" => "of1-dev-services:2347")
+    Songkick::Transport::Service.user_agent "myproject"
+    Songkick::Transport::Service.timeout 60 # optional, default is 10
+
+Subclass to create service clients:
+
+    class BlahService < Songkick::Transport::Service
+      endpoint "blah-service"
+
+      # these global configs can also be set at the class level, in which case they
+      # override the global config
+      user_agent "myproject mainservice class"
+      timeout 10
+    end
+
+The default transport layer for clients inheriting from +Songkick::Transport::Service+
+is Curb, if you want to use something else you can override it globally or in a class 
+with:
+
+    transport_layer Songkick::Transport::HttParty
 
 == License
 
