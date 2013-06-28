@@ -25,8 +25,7 @@ module Songkick
       end
 
       def self.ancestor
-        ancestor = self.ancestors[1]
-        ancestor.respond_to?(:get_user_agent) ? ancestor : nil
+        self.ancestors.select {|a| a.respond_to?(:get_user_agent)}[1]
       end
 
       def self.get_endpoint_name
