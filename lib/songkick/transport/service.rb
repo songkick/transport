@@ -70,10 +70,12 @@ module Songkick
                                                                 timeout:    get_timeout)
       end
 
-      include Singleton
-
       def http
         @http ||= self.class.new_transport
+      end
+
+      def stub_transport(http)
+        @http = http
       end
 
       def rescue_404(response=nil)
