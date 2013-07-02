@@ -327,6 +327,10 @@ Subclass to create service clients:
       # override the global config
       user_agent "myproject mainservice class"
       timeout 10
+
+      def get_data
+        http.get("/stuff", :search => "name")
+      end
     end
 
 The default transport layer for clients inheriting from +Songkick::Transport::Service+
