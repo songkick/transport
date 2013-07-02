@@ -17,10 +17,6 @@ module Songkick
         @transport_layer = value
       end
 
-      def self.stub_transport(stub)
-        @stub_transport = stub
-      end
-
       def self.set_endpoints(hash)
         unless self == Songkick::Transport::Service
           raise "set_endpoints only on Songkick::Transport::Service"
@@ -52,10 +48,6 @@ module Songkick
         @transport_layer || (ancestor && ancestor.get_transport_layer) || Songkick::Transport::Curb
       end
 
-      def self.get_stub_transport
-        @stub_transport || (ancestor && ancestor.get_stub_transport) || nil
-      end
-
       def self.new_transport
         unless name = get_endpoint_name
           raise "no endpoint specified for #{self}, call endpoint 'foo' inside #{self}"
@@ -66,14 +58,16 @@ module Songkick
         unless user_agent = get_user_agent
           raise "no user agent specified for #{self}, call user_agent 'foo' inside #{self} or on Songkick::Transport::Service"
         end
-        get_stub_transport || get_transport_layer.new(endpoint, user_agent: user_agent, 
-                                                                timeout:    get_timeout)
+        get_transport_layer.new(endpoint, user_agent: user_agent, 
+                                          timeout:    get_timeout)
       end
-
-      include Singleton
 
       def http
         @http ||= self.class.new_transport
+      end
+
+      def stub_transport(http)
+        @http = http
       end
 
       def rescue_404(response=nil)
