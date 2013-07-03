@@ -66,8 +66,8 @@ module Songkick
         unless user_agent = get_user_agent
           raise "no user agent specified for #{self}, call user_agent 'foo' inside #{self} or on Songkick::Transport::Service"
         end
-        get_stub_transport || get_transport_layer.new(endpoint, user_agent: user_agent, 
-                                                                timeout:    get_timeout)
+        get_stub_transport || get_transport_layer.new(endpoint, :user_agent => user_agent, 
+                                                                :timeout    => get_timeout)
       end
 
       def http
