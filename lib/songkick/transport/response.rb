@@ -9,7 +9,9 @@ module Songkick
         when 204 then NoContent.new(status, headers, body)
         when 409 then UserError.new(status, headers, body)
         else
-          Transport.logger.warn "Received error code: #{status} -- #{request}"
+          unless status.to_i == 404
+            Transport.logger.warn "Received error code: #{status} -- #{request}"
+          end
           raise HttpError.new(request, status, headers, body)
         end
       rescue Yajl::ParseError
