@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name              = "songkick-transport"
-  s.version           = "1.0.2"
+  s.version           = "1.1.0"
   s.summary           = "HTTP client abstraction for service clients"
   s.author            = "James Coglan"
   s.email             = "james@songkick.com"
@@ -10,7 +10,7 @@ Gem::Specification.new do |s|
   s.rdoc_options      = %w[--main README.rdoc]
   s.require_paths     = %w[lib]
 
-  s.files = %w[README.rdoc] + Dir.glob("{examples,lib,spec}/**/*.rb")
+  s.files = %w[README.rdoc] + Dir.glob("{examples,lib,spec}/**/*.rb") + Dir.glob("{examples,lib,spec}/**/*.erb")
   
   s.add_dependency "multipart-post", ">= 1.1.0"
   s.add_dependency "yajl-ruby", ">= 1.1.0"

@@ -1,0 +1,143 @@
+<%# don't copy this style, this is just for development mode %>
+<% begin %>
+  <div id="transport-report">
+    <script>
+      function transportReportToggle() {
+        var element = document.getElementById("transport-report").getElementsByClassName("service-metrics")[0];
+        if(element.style.display == "none") {
+          element.style.display = "block";
+        } else {
+          element.style.display = "none";
+        }
+      }
+    </script>
+
+    <style>
+      #transport-report {
+        position: absolute;
+        top: 25px;
+        left: 3px;
+        z-index: 100000;
+        font-size: 11px;
+      }
+
+      #transport-report .switch {
+        color: #333;
+        border: 1px solid #555;
+        background-color: #999;
+        padding: 3px;
+      }
+
+      #transport-report .service-metrics {
+        color: #333;
+        margin-top: 2px;
+        border: 1px solid #aaa;
+        background-color: #eee;
+        padding: 4px;
+        padding-left: 7px;
+        padding-right: 7px;
+      }
+
+      #transport-report .total {
+        color: #333;
+        font-weight: bold;
+        font-size: 0.9em;
+      }
+
+      #transport-report table {
+        width: 100%;
+        font-size: 11px;
+      }
+
+      #transport-report td.data-header {
+        font-weight: bold;
+      }
+
+      #transport-report td.data-footer {
+        font-weight: bold;
+      }
+
+      #transport-report td.data-ms {
+        text-align: right;
+      }
+
+      #transport-report td.data-verb {
+        font-size: 0.8em;
+        width: 40px;
+        vertical-align: top;
+      }
+
+      #transport-report td.data-path {
+        width: 300px;
+      }
+
+      #transport-report .duplicate-request {
+        color: red;
+      }
+
+      #transport-report .params {
+        color: gray;
+      }
+
+      #transport-report div.params {
+        display: none;
+      }
+
+      #transport-report a.request-link:hover + div.params {
+        display: block;
+      }
+    </style>
+
+    <% if report = Songkick::Transport::Reporting.report %>
+      <% services = Hash.new { |hash, key| hash[key] = {:total_duration => 0, :requests => []} }%>
+      <% report.each do |request|
+           service_name = endpoints_to_names[request.endpoint]
+           services[service_name][:total_duration] += request.duration.to_i
+           services[service_name][:requests] << request
+         end %>
+
+      <a class="switch" onclick="transportReportToggle();">SERVICES (<span class="total"><%= services.values.inject(0) {|m,o| m + o[:total_duration]} %> ms</span>)</a>
+
+      <div id="transport-report-data" class="service-metrics" style="display:none;">
+        <% already = {} %>
+        <% services.to_a.sort_by {|_, h| h[:total_duration]}.reverse.each do |service_name, hash| %>
+
+        <table>
+          <tr><td class="data-header" colspan="3"><%= service_name %></td></tr>
+
+          <% hash[:requests].each do |request| %>
+            <tr>
+              <td class="data-verb"><%= request.verb.upcase %></td>
+              <td class="data-path">
+                <% if request.verb == "GET" %>
+                  <% nice_params = (request.params.any? ? "?#{request.params.to_a.sort_by {|x,_| x.to_s}.map {|k,v| "#{k}=#{v}"}.join("&") }": "no params") %>
+                  <% path = request.path + nice_params  %>
+                  <% uri = request.endpoint + path %>
+                  <a class="request-link <%= "duplicate-request" if already[uri] %>" href="http://<%= uri %>">
+                    <%= request.path.split("?").first[0..40] %>
+                  </a>
+                  <div class="params">
+                    <%= nice_params %>
+                  </div>
+                <% else %>
+                  <%= request.path.split("?").first %>
+                <% end %>
+              </td>
+              <td class="data-ms"><%= request.duration.to_i %> ms</td>
+            </tr>
+            <% already[uri] = true %>
+          <% end %>
+          <tr><td></td><td></td><td class="data-footer data-ms"><%= hash[:total_duration] %> ms</td></tr>
+        </table>
+
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+
+<% rescue => e %>
+  <!-- <%= e.message %> -->
+  <% e.backtrace.each do |line| %>
+    <!-- <%= line %> -->
+  <% end %>
+<% end %>
