@@ -78,8 +78,7 @@ class TestApp < Sinatra::Base
   
   def self.stop
     @server.stop
-    sleep 0.1
-  rescue
+    sleep 1
   end
 end
 
