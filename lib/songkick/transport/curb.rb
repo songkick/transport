@@ -35,8 +35,9 @@ module Songkick
       def execute_request(req)
         connection.reset
         
-        connection.url = req.url
-        connection.timeout = req.timeout || @timeout
+        connection.url     = req.url
+        timeout            = req.timeout || @timeout
+        connection.timeout = timeout
         connection.headers.update(DEFAULT_HEADERS.merge(req.headers))
         
         response_headers = {}
@@ -67,7 +68,7 @@ module Songkick
         raise Transport::ConnectionFailedError, req
 
       rescue Curl::Err::TimeoutError => error
-        logger.warn "Request timed out after #{@timeout}s : #{req}"
+        logger.warn "Request timed out after #{timeout}s : #{req}"
         raise Transport::TimeoutError, req
 
       rescue Curl::Err::GotNothingError => error
