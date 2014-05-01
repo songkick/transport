@@ -16,15 +16,17 @@ module Songkick
         req = Request.new(endpoint, verb, path, params, headers.merge(head), timeout)
         Reporting.log_request(req)
 
-        req.response = execute_request(req)
+        begin
+          req.response = execute_request(req)
+        rescue => error
+          req.error = error
+          Reporting.record(req)
+          raise error
+        end
 
         Reporting.log_response(req)
         Reporting.record(req)
         req.response
-      rescue => error
-        req.error = error
-        Reporting.record(req)
-        raise error
       end
 
       def with_headers(headers = {})
