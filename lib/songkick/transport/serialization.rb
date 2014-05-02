@@ -1,18 +1,18 @@
 module Songkick
   module Transport
     module Serialization
-      
+
       extend self
-      
+
       SANITIZED_VALUE = '[REMOVED]'
-      
+
       def build_url(verb, host, path, params, scrub=false)
         url = host + path
         return url if USE_BODY.include?(verb)
         qs  = build_query_string(params, true, scrub)
         url + (qs == '' ? '' : '?' + qs)
       end
-      
+
       def build_query_string(params, fully_encode = true, sanitize = false)
         return params if String === params
         pairs = []
@@ -21,7 +21,7 @@ module Songkick
           pairs << [key, value]
         end
         if fully_encode
-          pairs.map { |p| p.join('=') }.join('&') 
+          pairs.map { |p| p.join('=') }.join('&')
         else
           pairs.inject({}) do |hash, pair|
             hash[pair.first] = pair.last
@@ -29,7 +29,7 @@ module Songkick
           end
         end
       end
-      
+
       def each_qs_param(prefix, value, fully_encode = true, &block)
         case value
         when Array
@@ -47,7 +47,7 @@ module Songkick
           block.call(prefix, encoded)
         end
       end
-      
+
       def multipart?(params)
         case params
         when Hash  then params.any? { |k,v| multipart? v }
@@ -55,25 +55,25 @@ module Songkick
         else Transport::IO === params
         end
       end
-      
+
       def sanitize?(key)
         Transport.sanitized_params.any? { |param| param === key }
       end
-      
+
       def serialize_multipart(params, boundary = Multipartable::DEFAULT_BOUNDARY)
         params = build_query_string(params, false)
-        
+
         parts = params.map { |k,v| Parts::Part.new(boundary, k, v) }
         parts << Parts::EpiloguePart.new(boundary)
         ios = parts.map { |p| p.to_io }
-        
+
         {
           :content_type   => "multipart/form-data; boundary=#{boundary}",
           :content_length => parts.inject(0) { |sum,i| sum + i.length }.to_s,
           :body           => CompositeReadIO.new(*ios).read
         }
       end
-      
+
     end
   end
 end
