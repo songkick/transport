@@ -1,4 +1,4 @@
-<%# don't copy this style, this is just for development mode %>
+<% # don't copy this style, this is just for development mode %>
 <% begin %>
   <div id="transport-report">
     <script>
@@ -136,8 +136,5 @@
   </div>
 
 <% rescue => e %>
-  <!-- <%= e.message %> -->
-  <% e.backtrace.each do |line| %>
-    <!-- <%= line %> -->
-  <% end %>
+  <!-- Error generating transport report -->
 <% end %>
