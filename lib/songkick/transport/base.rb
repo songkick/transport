@@ -2,7 +2,7 @@ module Songkick
   module Transport
 
     class Base
-      attr_accessor :user_agent
+      attr_accessor :user_agent, :user_error_codes
 
       HTTP_VERBS.each do |verb|
         class_eval %{
@@ -40,7 +40,7 @@ module Songkick
       private
 
       def process(url, status, headers, body)
-        Response.process(url, status, headers, body)
+        Response.process(url, status, headers, body, @user_error_codes)
       end
 
       def headers

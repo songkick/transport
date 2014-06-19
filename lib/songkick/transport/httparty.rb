@@ -12,6 +12,8 @@ module Songkick
         
         transport = klass.new
         transport.user_agent = options[:user_agent]
+        transport.user_error_codes =
+          options[:user_error_codes] || DEFAULT_USER_ERROR_CODES
         transport
       end
       

@@ -2,12 +2,12 @@ module Songkick
   module Transport
     
     class Response
-      def self.process(request, status, headers, body)
+      def self.process(request, status, headers, body, user_error_codes=409)
         case status.to_i
         when 200 then OK.new(status, headers, body)
         when 201 then Created.new(status, headers, body)
         when 204 then NoContent.new(status, headers, body)
-        when 409 then UserError.new(status, headers, body)
+        when *user_error_codes then UserError.new(status, headers, body)
         else
           raise HttpError.new(request, status, headers, body)
         end
