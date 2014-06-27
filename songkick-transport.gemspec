@@ -16,7 +16,7 @@ Gem::Specification.new do |s|
   s.add_dependency "yajl-ruby", ">= 1.1.0"
   
   s.add_development_dependency "curb", ">= 0.3.0"
-  s.add_development_dependency "httparty", ">= 0.4.0", "< 0.13.0"
+  s.add_development_dependency "httparty", ">= 0.4.0", "< 0.12.0"
   s.add_development_dependency "rack-test", ">= 0.4.0"
 
   s.add_development_dependency "rspec"
