@@ -1,8 +1,8 @@
 require "spec_helper"
 
 shared_examples_for "Songkick::Transport" do
-  before { TestApp.listen(4567) }
-  after  { TestApp.stop }
+  before(:all) { TestApp.listen(4567) }
+  after(:all)  { TestApp.stop }
 
   describe :get do
     it "retrieves data using GET" do
