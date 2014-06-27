@@ -4,7 +4,6 @@ shared_examples_for "Songkick::Transport" do
   before(:all) { TestApp.listen(4567) }
   after(:all)  { TestApp.stop }
 
-
   describe :get do
     it "retrieves data using GET" do
       transport.get("/artists/99").data.should == {"id" => 99}

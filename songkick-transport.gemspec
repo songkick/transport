@@ -11,10 +11,10 @@ Gem::Specification.new do |s|
   s.require_paths     = %w[lib]
 
   s.files = %w[README.rdoc] + Dir.glob("{examples,lib,spec}/**/*.rb") + Dir.glob("{examples,lib,spec}/**/*.erb")
-
+  
   s.add_dependency "multipart-post", ">= 1.1.0"
   s.add_dependency "yajl-ruby", ">= 1.1.0"
-
+  
   s.add_development_dependency "curb", ">= 0.3.0"
   s.add_development_dependency "httparty", ">= 0.4.0"
   s.add_development_dependency "rack-test", ">= 0.4.0"
