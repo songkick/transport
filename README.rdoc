@@ -2,8 +2,6 @@
 
 http://songkickontour.appspot.com/lego_tourbus.png
 
-(Image from {Songkick on Tour}[http://songkickontour.appspot.com])
-
 This is a transport layer abstraction for talking to our service APIs. It
 provides an abstract HTTP-like interface while hiding the underlying transport
 and serialization details. It transparently deals with parameter serialization,
