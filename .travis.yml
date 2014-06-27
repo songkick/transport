@@ -6,10 +6,16 @@ rvm:
   - 2.1.2
 gemfile:
   - Gemfile
-  - Gemfile-1.8.rb
+  - Gemfile.18
 matrix:
   exclude:
     - rvm: 1.8.7
       gemfile: Gemfile
+    - rvm: 1.9.3
+      gemfile: Gemfile.18
+    - rvm: 2.0.0
+      gemfile: Gemfile.18
+    - rvm: 2.1.2
+      gemfile: Gemfile.18
 
 script: bundle exec rspec spec/
