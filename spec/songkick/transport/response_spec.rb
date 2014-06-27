@@ -9,11 +9,11 @@ describe Songkick::Transport::Response do
     let(:response) { process("", 200, {"Content-Type" => "application/json; charset=utf-8"}, '{"hello":"world"}') }
     
     it "is an OK" do
-      response.should be_a(Songkick::Transport::Response::OK)
+      expect(response).to be_a(Songkick::Transport::Response::OK)
     end
     
     it "exposes its data" do
-      response.data.should == {"hello" => "world"}
+      expect(response.data).to eq({"hello" => "world"})
     end
   end
   
@@ -21,11 +21,11 @@ describe Songkick::Transport::Response do
     let(:response) { process("", 200, {"Content-Type" => "application/json"}, "{\"hello\":\"world\"\n\n}") }
     
     it "is an OK" do
-      response.should be_a(Songkick::Transport::Response::OK)
+      expect(response).to be_a(Songkick::Transport::Response::OK)
     end
     
     it "exposes its data" do
-      response.data.should == {"hello" => "world"}
+      expect(response.data).to eq({"hello" => "world"})
     end
   end
   
@@ -33,7 +33,7 @@ describe Songkick::Transport::Response do
     let(:response) { process("", 200, {"Content-Type" => "application/json"}, {"hello" => "world"}) }
     
     it "exposes its data" do
-      response.data.should == {"hello" => "world"}
+      expect(response.data).to eq({"hello" => "world"})
     end
   end
   
@@ -41,7 +41,7 @@ describe Songkick::Transport::Response do
     let(:response) { process("", 200, {}, "") }
     
     it "exposes its data" do
-      response.data.should be_nil
+      expect(response.data).to be_nil
     end
   end
   
@@ -49,7 +49,7 @@ describe Songkick::Transport::Response do
     let(:response) { process("", 201, {}, "") }
     
     it "is a Created" do
-      response.should be_a(Songkick::Transport::Response::Created)
+      expect(response).to be_a(Songkick::Transport::Response::Created)
     end
   end
   
@@ -57,7 +57,7 @@ describe Songkick::Transport::Response do
     let(:response) { process("", 204, {}, "") }
     
     it "is a NoContent" do
-      response.should be_a(Songkick::Transport::Response::NoContent)
+      expect(response).to be_a(Songkick::Transport::Response::NoContent)
     end
   end
   
@@ -65,11 +65,11 @@ describe Songkick::Transport::Response do
     let(:response) { process("", 409, {"Content-Type" => "application/json"}, '{"errors":[]}') }
     
     it "is a UserError" do
-      response.should be_a(Songkick::Transport::Response::UserError)
+      expect(response).to be_a(Songkick::Transport::Response::UserError)
     end
     
     it "exposes the errors" do
-      response.errors.should == []
+      expect(response.errors).to eq([])
     end
   end
 
@@ -77,11 +77,11 @@ describe Songkick::Transport::Response do
     let(:response) { process("", 422, {"Content-Type" => "application/json"}, '{"errors":[]}', [409, 422]) }
     
     it "is a UserError" do
-      response.should be_a(Songkick::Transport::Response::UserError)
+      expect(response).to be_a(Songkick::Transport::Response::UserError)
     end
     
     it "exposes the errors" do
-      response.errors.should == []
+      expect(response.errors).to eq([])
     end
   end
 end

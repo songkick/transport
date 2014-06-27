@@ -33,7 +33,7 @@ module Songkick
           begin
             subject.execute_request(request)
           rescue => e
-            e.class.should == exception
+            expect(e.class).to eq(exception)
           end
         end
       end
