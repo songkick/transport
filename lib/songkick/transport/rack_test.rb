@@ -17,6 +17,7 @@ module Songkick
       def initialize(app, options = {})
         @app     = app
         @timeout = options[:timeout] || DEFAULT_TIMEOUT
+        @user_error_codes = options[:user_error_codes] || DEFAULT_USER_ERROR_CODES
       end
       
       HTTP_VERBS.each do |verb|

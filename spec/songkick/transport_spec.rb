@@ -184,6 +184,19 @@ describe Songkick::Transport do
         @report.total_duration.should == 3.14
       end
     end
+
+    describe "error_status_codes" do
+      let(:codes) { [409, 422] }
+      
+      it "can be provided on initialization" do
+        transport = described_class.new(endpoint, user_error_codes: codes)
+        transport.user_error_codes.should == codes
+      end
+      
+      it "default to 409" do
+        transport.user_error_codes.should == [409]
+      end
+    end
   end
 
   describe Songkick::Transport::Curb do

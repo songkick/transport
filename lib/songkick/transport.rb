@@ -8,6 +8,7 @@ module Songkick
   module Transport
     DEFAULT_TIMEOUT = 5
     DEFAULT_FORMAT  = :json
+    DEFAULT_USER_ERROR_CODES = [409]
     
     HTTP_VERBS    = %w[options head get patch post put delete]
     USE_BODY      = %w[post put]

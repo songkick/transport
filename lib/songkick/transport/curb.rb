@@ -19,6 +19,7 @@ module Songkick
         @host       = host
         @timeout    = options[:timeout] || DEFAULT_TIMEOUT
         @user_agent = options[:user_agent]
+        @user_error_codes = options[:user_error_codes] || DEFAULT_USER_ERROR_CODES
         if c = options[:connection]
           Thread.current[:transport_curb_easy] = c
         end
