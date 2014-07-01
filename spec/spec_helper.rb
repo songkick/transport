@@ -7,25 +7,26 @@ require 'thin'
 
 Thin::Logging.silent = true
 Songkick::Transport.logger = Logger.new(StringIO.new)
+RSpec.configure { |config| config.raise_errors_for_deprecations! }
 
 class TestApp < Sinatra::Base
   before do
     headers 'Content-Type' => 'application/json'
   end
-  
+
   get('/')  { Yajl::Encoder.encode(params) }
   post('/') { Yajl::Encoder.encode(params) }
-  
+
   get '/invalid' do
     '}'
   end
-  
+
   get '/authenticate' do
     env['HTTP_AUTHORIZATION'] ?
         Yajl::Encoder.encode('successful' => true) :
         Yajl::Encoder.encode('successful' => false)
   end
-  
+
   get '/artists/:id' do
     Yajl::Encoder.encode('id' => params[:id].to_i)
   end
@@ -34,15 +35,15 @@ class TestApp < Sinatra::Base
     headers 'Access-Control-Allow-Methods' => 'GET, PUT, DELETE'
     ''
   end
-  
+
   post '/artists' do
     Yajl::Encoder.encode('id' => 'new', 'name' => params[:name].upcase)
   end
-  
+
   post '/content' do
     Yajl::Encoder.encode('type' => env['CONTENT_TYPE'])
   end
-  
+
   put '/artists/:id' do
     name = params[:name] || CGI.parse(env['rack.input'].read)['name'].first || ''
     Yajl::Encoder.encode('id' => params[:id].to_i, 'name' => name.downcase)
@@ -51,7 +52,7 @@ class TestApp < Sinatra::Base
   post '/process' do
     Yajl::Encoder.encode('body' => request.body.read, 'type' => request.env['CONTENT_TYPE'])
   end
-  
+
   %w[post put].each do |verb|
     __send__(verb, '/upload') do
       c = params[:concert]
@@ -63,19 +64,19 @@ class TestApp < Sinatra::Base
       )
     end
   end
-  
+
   def self.ensure_reactor_running
     Thread.new { EM.run } unless EM.reactor_running?
     Thread.pass until EM.reactor_running?
   end
-  
+
   def self.listen(port)
     ensure_reactor_running
     thin = Rack::Handler.get('thin')
     app  = Rack::Lint.new(self)
     thin.run(app, :Port => port) { |s| @server = s }
   end
-  
+
   def self.stop
     @server.stop
     sleep 1
