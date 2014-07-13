@@ -66,7 +66,7 @@ module Songkick
         unless user_agent = get_user_agent
           raise "no user agent specified for #{self}, call user_agent 'foo' inside #{self} or on Songkick::Transport::Service"
         end
-        get_stub_transport || get_transport_layer.new(endpoint, :user_agent => user_agent, 
+        get_stub_transport || get_transport_layer.new(endpoint, :user_agent => user_agent,
                                                                 :timeout    => get_timeout)
       end
 
@@ -77,13 +77,6 @@ module Songkick
       def stub_transport(http)
         @http = http
       end
-
-      def rescue_404(response=nil)
-        yield
-      rescue Songkick::Transport::HttpError => e
-        e.status == 404 ? response : (raise e)
-      end
-
     end
   end
 end
