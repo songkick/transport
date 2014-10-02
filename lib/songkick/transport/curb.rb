@@ -14,7 +14,7 @@ module Songkick
       def self.clear_thread_connection
          Thread.current[:transport_curb_easy] = nil
       end
-      
+
       def initialize(host, options = {})
         @host       = host
         @timeout    = options[:timeout] || DEFAULT_TIMEOUT
@@ -24,25 +24,25 @@ module Songkick
           Thread.current[:transport_curb_easy] = c
         end
       end
-      
+
       def connection
         Thread.current[:transport_curb_easy] ||= Curl::Easy.new
       end
-      
+
       def endpoint
         @host
       end
-      
+
       def execute_request(req)
         connection.reset
-        
+
         connection.url     = req.url
         timeout            = req.timeout || @timeout
         connection.timeout = timeout
         connection.headers.update(DEFAULT_HEADERS.merge(req.headers))
-        
+
         response_headers = {}
-        
+
         connection.on_header do |header_line|
           line = header_line.sub(/\r\n$/, '')
           parts = line.split(/:\s*/)
@@ -51,7 +51,7 @@ module Songkick
           end
           header_line.bytesize
         end
-        
+
         if req.use_body?
           connection.__send__("http_#{req.verb}", req.body)
         else
