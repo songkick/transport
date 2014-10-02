@@ -19,6 +19,7 @@ module Songkick
         @host       = host
         @timeout    = options[:timeout] || DEFAULT_TIMEOUT
         @user_agent = options[:user_agent]
+        @no_signal   = !!options[:no_signal]
         @user_error_codes = options[:user_error_codes] || DEFAULT_USER_ERROR_CODES
         if c = options[:connection]
           Thread.current[:transport_curb_easy] = c
@@ -40,6 +41,9 @@ module Songkick
         timeout            = req.timeout || @timeout
         connection.timeout = timeout
         connection.headers.update(DEFAULT_HEADERS.merge(req.headers))
+        if @no_signal
+          connection.nosignal = true
+        end
 
         response_headers = {}
 
