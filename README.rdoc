@@ -148,6 +148,10 @@ parsers for other content-types like so:
 
 The parser object you register must respond to <tt>parse(string)</tt>.
 
+You can also register a default parser, to handle all content types that don't have a specified parser.
+
+    Songkick::Transport.register_default_parser(DefaultParser)
+
 
 === Nested parameters
 

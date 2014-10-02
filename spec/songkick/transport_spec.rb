@@ -197,6 +197,7 @@ shared_examples_for "Songkick::Transport" do
       expect(transport.user_error_codes).to eq([409])
     end
   end
+
 end
 
 describe Songkick::Transport::Curb do
@@ -217,3 +218,51 @@ describe Songkick::Transport::RackTest do
   it_should_behave_like "Songkick::Transport"
 end
 
+describe Songkick::Transport do
+  describe "registering parsers" do
+    context "for JSON" do
+      it 'should use the JSON parser' do
+        expect(described_class.parser_for('application/json')).to eq(Yajl::Parser)
+      end
+    end
+
+    context "for anything else" do
+      context 'when there is no registered parser' do
+        it 'should raise an error' do
+          expect { described_class.parser_for('application/xml') }.to raise_error(TypeError)
+        end
+      end
+
+      context 'when there is a registered parser' do
+        before do
+          described_class.register_parser('application/xml', :my_parser)
+        end
+
+        it 'should return that parser' do
+          expect(described_class.parser_for('application/xml')).to eq(:my_parser)
+        end
+
+        context 'when there is no registered parser' do
+          it 'should raise an error' do
+            expect { described_class.parser_for('application/x-something-else') }.to raise_error(TypeError)
+          end
+        end
+
+        context 'when there is a default registered parser' do
+          before do
+            described_class.register_default_parser(:my_default_parser)
+          end
+
+          it 'should return that parser' do
+            expect(described_class.parser_for('application/x-something-else')).to eq(:my_default_parser)
+          end
+
+          it 'should return the already defined parser if specified' do
+            expect(described_class.parser_for('application/xml')).to eq(:my_parser)
+            expect(described_class.parser_for('application/json')).to eq(Yajl::Parser)
+          end
+        end
+      end
+    end
+  end
+end

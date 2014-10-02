@@ -41,8 +41,12 @@ module Songkick
       @parsers[content_type] = parser
     end
 
+    def self.register_default_parser(parser)
+      @default_parser = parser
+    end
+
     def self.parser_for(content_type)
-      parser = @parsers && @parsers[content_type]
+      parser = (@parsers && @parsers[content_type]) || @default_parser
       unless parser
         raise TypeError, "Could not find a parser for content-type: #{content_type}"
       end
