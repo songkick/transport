@@ -55,6 +55,7 @@
 
       #transport-report td.data-footer {
         font-weight: bold;
+        padding-bottom: 10px;
       }
 
       #transport-report td.data-ms {
@@ -109,7 +110,7 @@
             <tr>
               <td class="data-verb"><%= request.verb.upcase %></td>
               <td class="data-path">
-                <% if request.verb == "GET" %>
+                <% if request.verb.upcase == "GET" %>
                   <% nice_params = (request.params.any? ? "?#{request.params.to_a.sort_by {|x,_| x.to_s}.map {|k,v| "#{k}=#{v}"}.join("&") }": "no params") %>
                   <% path = request.path + nice_params  %>
                   <% uri = request.endpoint + path %>
@@ -127,7 +128,10 @@
             </tr>
             <% already[uri] = true %>
           <% end %>
-          <tr><td></td><td></td><td class="data-footer data-ms"><%= hash[:total_duration] %> ms</td></tr>
+          <tr>
+            <td colspan="2" class="data-footer"><%= hash[:requests].size %> request(s)</td>
+            <td class="data-footer data-ms"><%= hash[:total_duration] %> ms</td>
+          </tr>
         </table>
 
         <% end %>
