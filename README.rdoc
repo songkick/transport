@@ -349,6 +349,23 @@ with:
 
     transport_layer Songkick::Transport::HttParty
 
+You can specify extra headers to be sent with every request from a service class and
+from the root class, and they are merged together:
+
+    Songkick::Transport::Service.with_headers "rlah" => "1"
+
+    class BlahService < Songkick::Transport::Service
+      with_headers "blah" => "1"
+    end
+
+    class FlahService < BlahService
+      with_headers "flah" => "1"
+
+      def get_data
+        http.get("/stuff") # will have headers "rlah", "blah" and "flah"
+      end
+    end
+
 == License
 
 The MIT License

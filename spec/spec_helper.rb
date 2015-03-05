@@ -7,7 +7,7 @@ require 'thin'
 
 Thin::Logging.silent = true
 Songkick::Transport.logger = Logger.new(StringIO.new)
-RSpec.configure { |config| config.raise_errors_for_deprecations! }
+#RSpec.configure { |config| config.raise_errors_for_deprecations! }
 
 class TestApp < Sinatra::Base
   before do

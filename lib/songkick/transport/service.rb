@@ -70,8 +70,24 @@ module Songkick
                                                                 :timeout    => get_timeout)
       end
 
+      def self.with_headers(headers)
+        @with_headers ||= headers
+      end
+
+      def self.this_extra_headers
+        @with_headers || {}
+      end
+
+      def self.extra_headers
+        if superclass <= Songkick::Transport::Service
+          superclass.extra_headers.merge(this_extra_headers)
+        else
+          this_extra_headers
+        end
+      end
+
       def http
-        @http ||= self.class.new_transport
+        (@http ||= self.class.new_transport).with_headers(self.class.extra_headers)
       end
 
       def stub_transport(http)
