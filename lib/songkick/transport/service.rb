@@ -91,8 +91,9 @@ module Songkick
         extra_headers = self.class.extra_headers
         if extra_headers.any?
           r.with_headers(self.class.extra_headers)
+        else
+          r
         end
-        r
       end
 
       def stub_transport(http)
