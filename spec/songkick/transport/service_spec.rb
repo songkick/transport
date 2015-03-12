@@ -28,7 +28,18 @@ describe Songkick::Transport::Service do
       B.new.http
     end
 
+    it "can change headers" do
+      Songkick::Transport::Service.with_headers "S" => "sss"
+      Songkick::Transport::Service.with_headers "STS" => "sts"
+      B.with_headers "B" => "bbb"
+      A.with_headers "A" => "aaa"
 
+      http = double("http")
+      B.stub_transport(http)
+
+      http.should_receive(:with_headers).with("STS" => "sts", "B" => "bbb", "A" => "aaa")
+      B.new.http
+    end
   end
 end
 

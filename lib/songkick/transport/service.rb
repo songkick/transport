@@ -71,7 +71,7 @@ module Songkick
       end
 
       def self.with_headers(headers)
-        @with_headers ||= headers
+        @with_headers = headers
       end
 
       def self.this_extra_headers
