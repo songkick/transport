@@ -8,23 +8,6 @@ module Songkick
         Songkick::Transport::Curb.clear_thread_connection
       end
 
-      class FakeCurl
-        attr_writer :url, :timeout
-        attr_reader :on_header, :response_code, :body_str, :headers
-
-        def initialize(options)
-          @error = options[:error]
-          @headers = {}
-        end
-
-        def http(verb)
-          raise(@error, "bang") if @error
-        end
-
-        def reset
-        end
-      end
-
       subject{ Curb.new('localhost', :connection => @fake_curl) }
       let(:request){ Request.new('http://localhost', 'get', '/', {}) }
 

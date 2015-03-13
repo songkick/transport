@@ -15,6 +15,10 @@ module Songkick
         }
       end
 
+      def with_headers(headers = {})
+        HeaderDecorator.new(self, @headers.merge(headers))
+      end
+
       private
 
       def method_missing(*args, &block)

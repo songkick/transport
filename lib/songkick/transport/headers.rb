@@ -45,6 +45,10 @@ module Songkick
       def to_hash
         @hash.dup
       end
+
+      def ==(other)
+        to_hash == other.to_hash
+      end
     end
 
   end

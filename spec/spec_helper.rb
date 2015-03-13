@@ -83,3 +83,20 @@ class TestApp < Sinatra::Base
   end
 end
 
+class FakeCurl
+  attr_writer :url, :timeout
+  attr_reader :on_header, :response_code, :body_str, :headers
+
+  def initialize(options = {})
+    @error = options[:error]
+    @headers = {}
+  end
+
+  def http(verb)
+    raise(@error, "bang") if @error
+  end
+
+  def reset
+  end
+end
+

@@ -15,6 +15,14 @@ module Songkick
         }
       end
 
+      def with_headers(headers = {})
+        HeaderDecorator.new(self, @headers.merge(headers))
+      end
+
+      def with_timeout(timeout)
+        TimeoutDecorator.new(self, timeout)
+      end
+
       private
 
       def method_missing(*args, &block)
