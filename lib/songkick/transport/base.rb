@@ -37,7 +37,7 @@ module Songkick
           HeaderDecorator.new(self, headers)
         end
 
-        def with_timeout(timeout = DEFAULT_TIMEOUT)
+        def with_timeout(timeout)
           TimeoutDecorator.new(self, timeout)
         end
 
