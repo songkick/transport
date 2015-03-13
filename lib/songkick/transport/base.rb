@@ -40,6 +40,10 @@ module Songkick
         def with_timeout(timeout = DEFAULT_TIMEOUT)
           TimeoutDecorator.new(self, timeout)
         end
+
+        def with_params(params)
+          ParamsDecorator.new(self, params)
+        end
       end
 
       include API
@@ -95,6 +99,18 @@ module Songkick
 
         def do_verb(verb, path, params = {}, headers = {}, new_timeout = nil)
           client.do_verb(verb, path, params, headers, new_timeout || timeout)
+        end
+
+        def method_missing(*args, &block)
+          client.__send__(*args, &block)
+        end
+      end
+
+      class ParamsDecorator < Struct.new(:client, :params)
+        include API
+
+        def do_verb(verb, path, new_params = {}, headers = {}, timeout = nil)
+          client.do_verb(verb, path, params.merge(new_params), headers, timeout)
         end
 
         def method_missing(*args, &block)
