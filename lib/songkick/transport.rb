@@ -20,13 +20,11 @@ module Songkick
     autoload :Base,             ROOT + '/transport/base'
     autoload :Curb,             ROOT + '/transport/curb'
     autoload :Headers,          ROOT + '/transport/headers'
-    autoload :HeaderDecorator,  ROOT + '/transport/header_decorator'
     autoload :HttParty,         ROOT + '/transport/httparty'
     autoload :RackTest,         ROOT + '/transport/rack_test'
     autoload :Reporting,        ROOT + '/transport/reporting'
     autoload :Request,          ROOT + '/transport/request'
     autoload :Response,         ROOT + '/transport/response'
-    autoload :TimeoutDecorator, ROOT + '/transport/timeout_decorator'
     autoload :Service,          ROOT + '/transport/service'
 
     autoload :UpstreamError,        ROOT + '/transport/upstream_error'
