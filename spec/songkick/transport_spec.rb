@@ -200,10 +200,14 @@ shared_examples_for "Songkick::Transport" do
 
 end
 
-describe Songkick::Transport::Curb do
-  let(:endpoint)  { "http://localhost:4567" }
-  let(:transport) { Songkick::Transport::Curb.new(endpoint) }
-  it_should_behave_like "Songkick::Transport"
+
+# Curb always times out talking to the web server in the other thread when run on 1.8
+unless RUBY_VERSION =~ /^1.8/
+  describe Songkick::Transport::Curb do
+    let(:endpoint)  { "http://localhost:4567" }
+    let(:transport) { Songkick::Transport::Curb.new(endpoint) }
+    it_should_behave_like "Songkick::Transport"
+  end
 end
 
 describe Songkick::Transport::HttParty do
