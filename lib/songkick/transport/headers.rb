@@ -47,6 +47,7 @@ module Songkick
       end
 
       def ==(other)
+        return false unless other.is_a?(self.class)
         to_hash == other.to_hash
       end
     end

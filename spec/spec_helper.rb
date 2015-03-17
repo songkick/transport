@@ -55,6 +55,7 @@ class TestApp < Sinatra::Base
 
   %w[post put].each do |verb|
     __send__(verb, '/upload') do
+      begin
       c = params[:concert]
       Yajl::Encoder.encode(
         "filename" => c[:file][:filename],
@@ -62,6 +63,9 @@ class TestApp < Sinatra::Base
         "size"     => c[:file][:tempfile].size,
         "foo"      => c[:foo]
       )
+      rescue => e
+        p e
+      end
     end
   end
 
