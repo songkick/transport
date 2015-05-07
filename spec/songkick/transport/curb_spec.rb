@@ -32,6 +32,17 @@ module Songkick
         when_request_raises_the_exception(Curl::Err::GotNothingError)       { it_should_raise(Transport::UpstreamError)         }
         when_request_raises_the_exception(Curl::Err::RecvError)             { it_should_raise(Transport::UpstreamError)         }
       end
+
+      describe "headers parsing" do
+        let(:curl) { instance_double(Curl::Easy, :response_code => 200, :headers => {}).as_null_object }
+
+        it "should join multiple headers to one" do
+          allow(curl).to receive(:on_header).and_yield("Set-Cookie: a").and_yield("Set-Cookie: b")
+
+          response = subject.execute_request(request)
+          expect(response.headers["Set-Cookie"]).to eq "a, b"
+        end
+      end
     end
 
   end

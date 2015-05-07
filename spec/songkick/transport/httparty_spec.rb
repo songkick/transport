@@ -48,6 +48,24 @@ module Songkick
           when_request_raises_the_exception(UpstreamError)     { it_should_raise(Transport::UpstreamError)         }
           when_request_raises_the_exception(Exception)         { it_should_raise(Transport::UpstreamError)         }
         end
+
+        describe "headers parsing" do
+          let(:httparty) { Songkick::Transport::HttParty.new('localhost') }
+          let(:request) { Request.new('http://localhost:4567', 'get', '/with_headers', {}) }
+
+          before do
+            TestApp.listen(4567)
+          end
+
+          after do
+            TestApp.stop
+          end
+
+          it "should join multiple headers to one" do
+            response = httparty.execute_request(request)
+            expect(response.headers["Set-Cookie"]).to eq "a, b"
+          end
+        end
       end
     end
 
