@@ -40,6 +40,7 @@ module Songkick
         connection.url     = req.url
         timeout            = req.timeout || @timeout
         connection.timeout = timeout
+        connection.encoding = ''
         connection.headers.update(DEFAULT_HEADERS.merge(req.headers))
         if @no_signal
           connection.nosignal = true
