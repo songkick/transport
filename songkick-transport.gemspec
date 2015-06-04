@@ -1,8 +1,8 @@
 Gem::Specification.new do |s|
   s.name              = "songkick-transport"
-  s.version           = "1.5.4"
+  s.version           = "1.5.5"
   s.summary           = "HTTP client abstraction for service clients"
-  s.authors           = ["Daniel Lucraft", "James Coglan"]
+  s.authors           = ["Daniel Lucraft", "James Coglan", "Sabrina Leandro", "Robin Tweedie"]
   s.email             = "developers@songkick.com"
   s.homepage          = "http://github.com/songkick/transport"
 
@@ -11,10 +11,10 @@ Gem::Specification.new do |s|
   s.require_paths     = %w[lib]
 
   s.files = %w[README.rdoc] + Dir.glob("{examples,lib,spec}/**/*.rb") + Dir.glob("{examples,lib,spec}/**/*.erb")
-  
+
   s.add_dependency "multipart-post", ">= 1.1.0"
   s.add_dependency "yajl-ruby", ">= 1.1.0"
-  
+
   s.add_development_dependency "curb", ">= 0.3.0"
   s.add_development_dependency "httparty", ">= 0.4.0"
   s.add_development_dependency "rack-test", ">= 0.4.0"
@@ -23,4 +23,3 @@ Gem::Specification.new do |s|
   s.add_development_dependency "sinatra"
   s.add_development_dependency "thin"
 end
-
