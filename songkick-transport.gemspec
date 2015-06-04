@@ -1,12 +1,13 @@
 Gem::Specification.new do |s|
-  s.name              = "songkick-transport"
-  s.version           = "1.5.5"
-  s.license           = "MIT"
-  s.summary           = "HTTP client abstraction for service clients"
-  s.description       = "HTTP client abstraction for service clients"
-  s.authors           = ["Daniel Lucraft", "James Coglan", "Sabrina Leandro", "Robin Tweedie"]
-  s.email             = "developers@songkick.com"
-  s.homepage          = "http://github.com/songkick/transport"
+  s.name                  = "songkick-transport"
+  s.version               = "1.5.5"
+  s.license               = "MIT"
+  s.summary               = "HTTP client abstraction for service clients"
+  s.description           = "HTTP client abstraction for service clients"
+  s.authors               = ["Daniel Lucraft", "James Coglan", "Sabrina Leandro", "Robin Tweedie"]
+  s.email                 = "developers@songkick.com"
+  s.homepage              = "http://github.com/songkick/transport"
+  s.required_ruby_version = '>= 1.8.7'
 
   s.extra_rdoc_files  = %w[README.rdoc]
   s.rdoc_options      = %w[--main README.rdoc]
