@@ -4,9 +4,7 @@ module Songkick
   module Transport
 
     describe Curb do
-      after do
-        Songkick::Transport::Curb.clear_thread_connection
-      end
+      after { Songkick::Transport::Curb.clear_thread_connection }
 
       subject{ Curb.new('localhost', :connection => @fake_curl) }
       let(:request){ Request.new('http://localhost', 'get', '/', {}) }

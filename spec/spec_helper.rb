@@ -88,7 +88,7 @@ class TestApp < Sinatra::Base
 end
 
 class FakeCurl
-  attr_writer :url, :timeout
+  attr_writer :url, :timeout, :connection
   attr_reader :on_header, :response_code, :body_str, :headers
 
   def initialize(options = {})
