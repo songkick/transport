@@ -21,10 +21,10 @@ describe Songkick::Transport::Service do
       B.with_headers "B" => "bbb"
       A.with_headers "A" => "aaa"
 
-      http = double("http")
+      http = double(:http)
       B.stub_transport(http)
 
-      http.should_receive(:with_headers).with("S" => "sss", "B" => "bbb", "A" => "aaa")
+      expect(http).to receive(:with_headers).with("S" => "sss", "B" => "bbb", "A" => "aaa")
       B.new.http
     end
 
@@ -34,12 +34,11 @@ describe Songkick::Transport::Service do
       B.with_headers "B" => "bbb"
       A.with_headers "A" => "aaa"
 
-      http = double("http")
+      http = double(:http)
       B.stub_transport(http)
 
-      http.should_receive(:with_headers).with("STS" => "sts", "B" => "bbb", "A" => "aaa")
+      expect(http).to receive(:with_headers).with("STS" => "sts", "B" => "bbb", "A" => "aaa")
       B.new.http
     end
   end
 end
-
