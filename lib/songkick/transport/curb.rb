@@ -80,6 +80,11 @@ module Songkick
       rescue Curl::Err::GotNothingError => error
         logger.warn "Got nothing: #{req}"
         raise Transport::UpstreamError, req
+
+      rescue Curl::Err::RecvError => error
+        logger.warn "Failure receiving network data: #{error.message} : #{req}"
+        raise Transport::UpstreamError, req
+
       end
     end
 
