@@ -9,13 +9,13 @@ module Songkick
     DEFAULT_TIMEOUT = 5
     DEFAULT_FORMAT  = :json
     DEFAULT_USER_ERROR_CODES = [409]
-    
+
     HTTP_VERBS    = %w[options head get patch post put delete]
     USE_BODY      = %w[post put]
     FORM_ENCODING = 'application/x-www-form-urlencoded'
-    
+
     ROOT = File.expand_path('..', __FILE__)
-    
+
     autoload :Serialization,    ROOT + '/transport/serialization'
     autoload :Base,             ROOT + '/transport/base'
     autoload :Curb,             ROOT + '/transport/curb'
@@ -52,52 +52,51 @@ module Songkick
     end
 
     register_parser 'application/json', Yajl::Parser
-    
+
     IO = UploadIO
-    
+
     def self.io(object)
       if Hash === object and [:tempfile, :type, :filename].all? { |k| object.has_key? k } # Rack upload
         Transport::IO.new(object[:tempfile], object[:type], object[:filename])
-        
+
       elsif object.respond_to?(:content_type) and object.respond_to?(:original_filename) # Rails upload
         Transport::IO.new(object, object.content_type, object.original_filename)
-        
+
       else
         raise ArgumentError, "Could not generate a Transport::IO from #{object.inspect}"
       end
     end
-    
+
     def self.logger
       @logger ||= begin
                     require 'logger'
                     Logger.new(STDOUT)
                   end
     end
-    
+
     def self.logger=(logger)
       @logger = logger
     end
-    
+
     def self.verbose=(verbose)
       @verbose = verbose
     end
-    
+
     def self.verbose?
       @verbose
     end
-    
+
     def self.report
       Reporting.report
     end
-    
+
     def self.sanitize(*params)
       sanitized_params.concat(params)
     end
-    
+
     def self.sanitized_params
       @sanitized_params ||= []
     end
-    
+
   end
 end
-
