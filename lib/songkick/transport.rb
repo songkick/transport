@@ -27,12 +27,12 @@ module Songkick
     autoload :Response,         ROOT + '/transport/response'
     autoload :Service,          ROOT + '/transport/service'
 
-    autoload :UpstreamError,        ROOT + '/transport/upstream_error'
-    autoload :HostResolutionError,  ROOT + '/transport/upstream_error'
-    autoload :TimeoutError,         ROOT + '/transport/upstream_error'
-    autoload :ConnectionFailedError,ROOT + '/transport/upstream_error'
-    autoload :InvalidJSONError,     ROOT + '/transport/upstream_error'
-    autoload :HttpError,            ROOT + '/transport/http_error'
+    autoload :UpstreamError,         ROOT + '/transport/upstream_error'
+    autoload :HostResolutionError,   ROOT + '/transport/upstream_error'
+    autoload :TimeoutError,          ROOT + '/transport/upstream_error'
+    autoload :ConnectionFailedError, ROOT + '/transport/upstream_error'
+    autoload :InvalidJSONError,      ROOT + '/transport/upstream_error'
+    autoload :HttpError,             ROOT + '/transport/http_error'
 
     def self.register_parser(content_type, parser)
       @parsers ||= {}
