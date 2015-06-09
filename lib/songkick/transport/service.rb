@@ -3,9 +3,15 @@ module Songkick
     class Service
       DEFAULT_TIMEOUT = 10
 
+      def self.ancestor
+        warn "DEPRECATED: calling ancestor on #{self}"
+        self.ancestors.select { |a| a.respond_to?(:get_user_agent) }[1]
+      end
+
       def self.parent_service
         superclass if superclass <= Songkick::Transport::Service
       end
+      private_class_method :parent_service
 
       def self.endpoint(name)
         @endpoint_name = name.to_s
