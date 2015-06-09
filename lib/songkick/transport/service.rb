@@ -1,6 +1,8 @@
 module Songkick
   module Transport
     class Service
+      DEFAULT_TIMEOUT = 10
+
       def self.endpoint(name)
         @endpoint_name = name.to_s
       end
@@ -37,7 +39,7 @@ module Songkick
       end
 
       def self.get_timeout
-        @timeout || (ancestor && ancestor.get_timeout) || 10
+        @timeout || (ancestor && ancestor.get_timeout) || DEFAULT_TIMEOUT
       end
 
       def self.get_user_agent
@@ -66,7 +68,7 @@ module Songkick
         unless user_agent = get_user_agent
           raise "no user agent specified for #{self}, call user_agent 'foo' inside #{self} or on Songkick::Transport::Service"
         end
-        get_stub_transport || get_transport_layer.new(endpoint, :user_agent => user_agent, 
+        get_stub_transport || get_transport_layer.new(endpoint, :user_agent => user_agent,
                                                                 :timeout    => get_timeout)
       end
 
