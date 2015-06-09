@@ -31,7 +31,7 @@ module Songkick
       end
 
       def self.ancestor
-        self.ancestors.select {|a| a.respond_to?(:get_user_agent)}[1]
+        self.ancestors.detect { |ancestor| ancestor > self }
       end
 
       def self.get_endpoint_name
