@@ -2,10 +2,16 @@ module Songkick
   module Transport
     class Service
       DEFAULT_TIMEOUT = 10
+      DEFAULT_TRANSPORT = Songkick::Transport::Curb
 
       def self.ancestor
         warn "DEPRECATED: calling ancestor on #{self}"
         self.ancestors.select { |a| a.respond_to?(:get_user_agent) }[1]
+      end
+
+      def self.stub_transport(stub)
+        warn "DEPRECATED: classing stub_transport on #{self}"
+        @stub_transport = stub
       end
 
       def self.parent_service
@@ -29,8 +35,8 @@ module Songkick
         @transport_layer = value
       end
 
-      def self.stub_transport(stub)
-        @stub_transport = stub
+      def self.transport_layer_options(value)
+        @transport_layer_options = value
       end
 
       def self.set_endpoints(hash)
@@ -57,7 +63,11 @@ module Songkick
       end
 
       def self.get_transport_layer
-        @transport_layer || (parent_service && parent_service.get_transport_layer) || Songkick::Transport::Curb
+        @transport_layer || (parent_service && parent_service.get_transport_layer) || DEFAULT_TRANSPORT
+      end
+
+      def self.get_transport_layer_options
+        @transport_layer_options || (parent_service && parent_service.get_transport_layer_options) || {}
       end
 
       def self.get_stub_transport
@@ -74,8 +84,7 @@ module Songkick
         unless user_agent = get_user_agent
           raise "no user agent specified for #{self}, call user_agent 'foo' inside #{self} or on Songkick::Transport::Service"
         end
-        get_stub_transport || get_transport_layer.new(endpoint, :user_agent => user_agent,
-                                                                :timeout    => get_timeout)
+        get_stub_transport || get_transport_layer.new(endpoint, { :user_agent => user_agent, :timeout => get_timeout }.merge(get_transport_layer_options))
       end
 
       def self.with_headers(headers)
