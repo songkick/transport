@@ -3,6 +3,10 @@ module Songkick
     class Service
       DEFAULT_TIMEOUT = 10
 
+      def self.parent_service
+        superclass if superclass <= Songkick::Transport::Service
+      end
+
       def self.endpoint(name)
         @endpoint_name = name.to_s
       end
@@ -30,20 +34,16 @@ module Songkick
         @endpoints = hash
       end
 
-      def self.ancestor
-        self.ancestors.detect { |ancestor| ancestor > self }
-      end
-
       def self.get_endpoint_name
-        @endpoint_name || (ancestor && ancestor.get_endpoint_name)
+        @endpoint_name || (parent_service && parent_service.get_endpoint_name)
       end
 
       def self.get_timeout
-        @timeout || (ancestor && ancestor.get_timeout) || DEFAULT_TIMEOUT
+        @timeout || (parent_service && parent_service.get_timeout) || DEFAULT_TIMEOUT
       end
 
       def self.get_user_agent
-        @user_agent || (ancestor && ancestor.get_user_agent)
+        @user_agent || (parent_service && parent_service.get_user_agent)
       end
 
       def self.get_endpoints
@@ -51,11 +51,11 @@ module Songkick
       end
 
       def self.get_transport_layer
-        @transport_layer || (ancestor && ancestor.get_transport_layer) || Songkick::Transport::Curb
+        @transport_layer || (parent_service && parent_service.get_transport_layer) || Songkick::Transport::Curb
       end
 
       def self.get_stub_transport
-        @stub_transport || (ancestor && ancestor.get_stub_transport) || nil
+        @stub_transport || (parent_service && parent_service.get_stub_transport) || nil
       end
 
       def self.new_transport
@@ -81,8 +81,8 @@ module Songkick
       end
 
       def self.extra_headers
-        if superclass <= Songkick::Transport::Service
-          superclass.extra_headers.merge(this_extra_headers)
+        if parent_service
+          parent_service.extra_headers.merge(this_extra_headers)
         else
           this_extra_headers
         end
