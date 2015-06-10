@@ -10,7 +10,7 @@ module Songkick
       end
 
       def self.stub_transport(stub)
-        warn "DEPRECATED: classing stub_transport on #{self}"
+        warn "DEPRECATED: calling stub_transport on #{self}"
         @stub_transport = stub
       end
 
