@@ -14,6 +14,16 @@ module Songkick
         @stub_transport = stub
       end
 
+      def self.extra_headers
+        warn "DEPRECATED: calling extra_headers on #{self}"
+        get_with_headers
+      end
+
+      def self.this_extra_headers
+        warn "DEPRECATED: calling this_extra_headers on #{self}"
+        @with_headers || {}
+      end
+
       def self.parent_service
         superclass if superclass <= Songkick::Transport::Service
       end
@@ -74,6 +84,10 @@ module Songkick
         @stub_transport || (parent_service && parent_service.get_stub_transport) || nil
       end
 
+      def self.get_with_headers
+        ((parent_service && parent_service.get_with_headers) || {}).merge(@with_headers || {})
+      end
+
       def self.new_transport
         unless name = get_endpoint_name
           raise "no endpoint specified for #{self}, call endpoint 'foo' inside #{self}"
@@ -91,26 +105,10 @@ module Songkick
         @with_headers = headers
       end
 
-      def self.this_extra_headers
-        @with_headers || {}
-      end
-
-      def self.extra_headers
-        if parent_service
-          parent_service.extra_headers.merge(this_extra_headers)
-        else
-          this_extra_headers
-        end
-      end
-
       def http
         r = (@http ||= self.class.new_transport)
-        extra_headers = self.class.extra_headers
-        if extra_headers.any?
-          r.with_headers(self.class.extra_headers)
-        else
-          r
-        end
+        r.with_headers(self.class.get_with_headers) if !self.class.get_with_headers.empty?
+        r
       end
 
       def stub_transport(http)
