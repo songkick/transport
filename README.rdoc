@@ -366,6 +366,16 @@ from the root class, and they are merged together:
       end
     end
 
+To pass extra, perhaps transport-specific, options hashes to the transport
+layer on initialize, specify them with:
+
+    class FooService < Songkick::Transport::Service
+      transport_layer Songkick::Transport::Curb
+      transport_layer_options :no_signal => true
+    end
+
+These are also inheritable, and merge down like extra headers do.
+
 == License
 
 The MIT License

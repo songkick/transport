@@ -67,7 +67,7 @@ module Songkick
       end
 
       def self.get_transport_layer_options
-        @transport_layer_options || (parent_service && parent_service.get_transport_layer_options) || {}
+        ((parent_service && parent_service.get_transport_layer_options) || {}).merge(@transport_layer_options || {})
       end
 
       def self.get_stub_transport

@@ -12,7 +12,7 @@ module Songkick
       DEFAULT_HEADERS = {"Expect" => ""}
 
       def self.clear_thread_connection
-         Thread.current[:transport_curb_easy] = nil
+        Thread.current[:transport_curb_easy] = nil
       end
 
       def initialize(host, options = {})

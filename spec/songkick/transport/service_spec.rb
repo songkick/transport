@@ -40,12 +40,29 @@ describe Songkick::Transport::Service do
     end
 
     context 'with transport layer options' do
-      let(:given_options) { {:foo => 'bar'} }
+      let(:global_options) { {:foo => 'bar'} }
+      let(:upper_options)  { {:bar => 'baz'} }
+      let(:lower_options)  { {:bar => 'qux'} }
 
-      before { A.transport_layer_options given_options }
+      before do
+        Songkick::Transport::Service.transport_layer_options global_options
+        A.transport_layer_options upper_options
+        B.transport_layer_options lower_options
+      end
 
-      it "can pass arbitrary options to the underlying transport adapter" do
-        expect(described_class::DEFAULT_TRANSPORT).to receive(:new).with(anything, hash_including(given_options))
+      it "global options can be specified and are passed to the transport initializer" do
+        expect(described_class::DEFAULT_TRANSPORT).to receive(:new).with(anything, hash_including(global_options))
+        B.new.http
+      end
+
+      it "options can be specified per-class and are passed to the transport initializer" do
+        expect(described_class::DEFAULT_TRANSPORT).to receive(:new).with(anything, hash_including(upper_options))
+        A.new.http
+      end
+
+      it "options can be overridden per-class and are passed to the transport initializer" do
+        expect(described_class::DEFAULT_TRANSPORT).not_to receive(:new).with(anything, hash_including(upper_options))
+        expect(described_class::DEFAULT_TRANSPORT).to receive(:new).with(anything, hash_including(lower_options))
         B.new.http
       end
     end
