@@ -108,9 +108,6 @@ shared_examples_for "Songkick::Transport" do
   end
 
   describe "file uploads" do
-    before do
-    end
-
     after { file.close }
 
     let(:file)   { File.open(File.expand_path("../../songkick.png", __FILE__)) }
@@ -204,7 +201,6 @@ shared_examples_for "Songkick::Transport" do
   end
 
 end
-
 
 # Curb always times out talking to the web server in the other thread when run on 1.8
 unless RUBY_VERSION =~ /^1.8/
