@@ -2,24 +2,24 @@ require 'spec_helper'
 
 module Songkick
   module Transport
-   
+
     describe HttParty do
       class FakeJSONException < Exception; end
 
       let(:request){ Request.new('http://localhost', 'get', '/', {}) }
-      
+
       describe "handling errors" do
         class FakeHttparty < Songkick::Transport::HttParty::Adapter
           class << self
             attr_accessor :error
           end
-          
+
           def self.get(path, args)
             raise(error, "bang") if error
           end
-          
+
         end
-        
+
         def self.it_should_raise(exception)
           it "should raise error #{exception}" do
             begin
@@ -36,7 +36,7 @@ module Songkick
               FakeHttparty.error = raised_exception
               @httparty = Songkick::Transport::HttParty.new('localhost', {:adapter => FakeHttparty})
             end
-          
+
             class_exec(&block)
           end
         end
@@ -50,6 +50,6 @@ module Songkick
         end
       end
     end
-    
+
   end
 end
