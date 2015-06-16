@@ -2,8 +2,6 @@ module Songkick
   module Transport
 
     class Base
-      attr_accessor :user_agent, :user_error_codes
-
       module API
         def get(path, params = {}, head = {}, timeout = nil)
           do_verb("get", path, params, head, timeout)
@@ -48,27 +46,73 @@ module Songkick
 
       include API
 
+      attr_accessor :user_agent, :user_error_codes
+      attr_reader :host, :timeout, :instrumenter
+      alias_method :endpoint, :host
+      DEFAULT_INSTRUMENTATION_LABEL = 'http.songkick_transport'
+
+      def initialize(host, options = {})
+        @host       = host
+        @timeout    = options[:timeout] || DEFAULT_TIMEOUT
+        @user_agent = options[:user_agent]
+        @user_error_codes = options[:user_error_codes] || DEFAULT_USER_ERROR_CODES
+        @instrumenter ||= options[:instrumenter]
+        @instrumentation_label = options[:instrumentation_label] || DEFAULT_INSTRUMENTATION_LABEL
+      end
+
       def do_verb(verb, path, params = {}, head = {}, timeout = nil)
         req = Request.new(endpoint, verb, path, params, headers.merge(head), timeout)
         Reporting.log_request(req)
 
-        begin
-          req.response = execute_request(req)
-        rescue => error
-          req.error = error
-          Reporting.record(req)
-          raise error
+        instrument(req) do |payload|
+          begin
+            req.response = execute_request(req)
+            payload.merge!({ :status => req.response.status }) if req.response
+          rescue => error
+            req.error = error
+            payload.merge!({ :status => error.status }) if error.is_a?(HttpError)
+            Reporting.record(req)
+            raise error
+          ensure
+            payload.merge!(self.instrumentation_payload_extras)
+          end
         end
 
         Reporting.log_response(req)
         Reporting.record(req)
+
         req.response
+      end
+
+      def instrumentation_payload_extras
+        Thread.current[:transport_base_payload_extras] ||= {}
+      end
+
+      def instrumentation_payload_extras=(extras)
+        Thread.current[:transport_base_payload_extras] = {}
       end
 
       private
 
       def process(url, status, headers, body)
         Response.process(url, status, headers, body, @user_error_codes)
+      end
+
+      def instrument(request)
+        if self.instrumenter
+          payload = { :adapter => self.class.name,
+                      :endpoint => request.endpoint,
+                      :verb => request.verb,
+                      :path => request.path,
+                      :params => request.params,
+                      :headers => request.headers }
+
+          self.instrumenter.instrument(@instrumentation_label, payload) do
+            yield(payload)
+          end
+        else
+          yield({})
+        end
       end
 
       def headers
@@ -120,4 +164,3 @@ module Songkick
     end
   end
 end
-

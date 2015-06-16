@@ -4,10 +4,10 @@ module Songkick
   module Transport
 
     describe Curb do
-      after { Songkick::Transport::Curb.clear_thread_connection }
+      after { described_class.clear_thread_connection }
 
-      subject{ Curb.new('localhost', :connection => @fake_curl) }
-      let(:request){ Request.new('http://localhost', 'get', '/', {}) }
+      subject { described_class.new('localhost', :connection => @fake_curl) }
+      let(:request) { Request.new('http://localhost', 'get', '/', {}) }
 
       def self.it_should_raise(exception)
         it "should raise error #{exception}" do

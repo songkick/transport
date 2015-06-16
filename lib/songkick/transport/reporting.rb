@@ -67,4 +67,3 @@ module Songkick
 
   end
 end
-

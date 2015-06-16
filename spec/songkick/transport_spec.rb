@@ -4,7 +4,7 @@ shared_examples_for "Songkick::Transport" do
   before(:all) { TestApp.listen(4567) }
   after(:all)  { TestApp.stop }
 
-  describe :get do
+  describe "#get" do
     it "retrieves data using GET" do
       expect(transport.get("/artists/99").data).to eq({"id" => 99})
     end
@@ -40,9 +40,10 @@ shared_examples_for "Songkick::Transport" do
     it "raises an UpstreamError for invalid JSON" do
       expect { transport.get("/invalid") }.to raise_error(Songkick::Transport::InvalidJSONError)
     end
+
   end
 
-  describe :with_headers do
+  describe "#with_headers" do
     it "adds the given headers to requests" do
       data = transport.with_headers("Authorization" => "correct password").get("/authenticate").data
       expect(data).to eq({"successful" => true})
@@ -65,14 +66,14 @@ shared_examples_for "Songkick::Transport" do
     end
   end
 
-  describe :options do
+  describe "#options" do
     it "sends an OPTIONS request" do
       response = transport.options("/.well-known/host-meta")
       expect(response.headers["Access-Control-Allow-Methods"]).to eq("GET, PUT, DELETE")
     end
   end
 
-  describe :post do
+  describe "#post" do
     it "sends data using POST" do
       data = transport.post("/artists", :name => "Amon Tobin").data
       expect(data).to eq({"id" => "new", "name" => "AMON TOBIN"})
@@ -96,7 +97,7 @@ shared_examples_for "Songkick::Transport" do
     end
   end
 
-  describe :put do
+  describe "#put" do
     it "sends data using PUT" do
       data = transport.put("/artists/64", :name => "Amon Tobin").data
       expect(data).to eq({"id" => 64, "name" => "amon tobin"})
@@ -145,6 +146,54 @@ shared_examples_for "Songkick::Transport" do
         expect(response.data).to eq(expected_response)
       end
     end
+  end
+
+  describe 'instrumentation' do
+    let(:events) { [] }
+    let(:options) { { :instrumenter => ActiveSupport::Notifications } }
+
+    around do |example|
+      label = options[:instrumentation_label] || Songkick::Transport::Base::DEFAULT_INSTRUMENTATION_LABEL
+      options[:instrumenter].subscribed(subscriber, label) do
+        example.run
+      end
+    end
+
+    let(:subscriber) do
+      lambda { |*args| events << options[:instrumenter]::Event.new(*args) }
+    end
+
+    context 'for a successful request' do
+      let(:path) { '/artists/123' }
+
+      let(:expected_payload) do
+        hash_including(:adapter => /#{described_class.to_s}/,
+                       :path => path, :endpoint => transport.endpoint,
+                       :params => {}, :verb => 'get', :status => 200)
+      end
+
+
+      it 'instruments the request' do
+        transport.get(path)
+        expect(events.last.payload).to match(expected_payload)
+      end
+    end
+
+    context 'for an unsuccessful request' do
+      let(:path) { '/nothing' }
+
+      let(:expected_payload) do
+        hash_including(:adapter => /#{described_class.to_s}/,
+                       :path => path, :endpoint => transport.endpoint,
+                       :params => {}, :verb => 'post', :status => 404)
+      end
+
+      it 'instruments the request' do
+        expect { transport.post(path) }.to raise_error(Songkick::Transport::UpstreamError)
+        expect(events.last.payload).to match(expected_payload)
+      end
+    end
+
   end
 
   describe "reporting" do
@@ -205,21 +254,24 @@ end
 # Curb always times out talking to the web server in the other thread when run on 1.8
 unless RUBY_VERSION =~ /^1.8/
   describe Songkick::Transport::Curb do
+    let(:options)   { {} }
     let(:endpoint)  { "http://localhost:4567" }
-    let(:transport) { Songkick::Transport::Curb.new(endpoint) }
+    let(:transport) { described_class.new(endpoint, options) }
     it_should_behave_like "Songkick::Transport"
   end
 end
 
 describe Songkick::Transport::HttParty do
+  let(:options)   { {} }
   let(:endpoint)  { "http://localhost:4567" }
-  let(:transport) { Songkick::Transport::HttParty.new(endpoint) }
+  let(:transport) { described_class.new(endpoint, options) }
   it_should_behave_like "Songkick::Transport"
 end
 
 describe Songkick::Transport::RackTest do
+  let(:options)   { {} }
   let(:endpoint)  { TestApp }
-  let(:transport) { Songkick::Transport::RackTest.new(endpoint) }
+  let(:transport) { described_class.new(endpoint, options) }
   it_should_behave_like "Songkick::Transport"
 end
 

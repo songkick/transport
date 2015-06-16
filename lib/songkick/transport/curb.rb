@@ -16,25 +16,25 @@ module Songkick
       end
 
       def initialize(host, options = {})
-        @host       = host
-        @timeout    = options[:timeout] || DEFAULT_TIMEOUT
-        @user_agent = options[:user_agent]
-        @no_signal   = !!options[:no_signal]
-        @user_error_codes = options[:user_error_codes] || DEFAULT_USER_ERROR_CODES
-        if c = options[:connection]
-          Thread.current[:transport_curb_easy] = c
-        end
+        super(host, options)
+        @no_signal  = !!options[:no_signal]
+        Thread.current[:transport_curb_easy] ||= options[:connection]
       end
 
       def connection
         Thread.current[:transport_curb_easy] ||= Curl::Easy.new
       end
 
-      def endpoint
-        @host
+      def instrumentation_payload_extras
+        Thread.current[:transport_curb_payload_extras] ||= {}
+      end
+
+      def instrumentation_payload_extras=(extras)
+        Thread.current[:transport_curb_payload_extras] = {}
       end
 
       def execute_request(req)
+        self.instrumentation_payload_extras = {} if self.instrumenter
         connection.reset
 
         connection.url     = req.url
@@ -42,9 +42,7 @@ module Songkick
         connection.timeout = timeout
         connection.encoding = ''
         connection.headers.update(DEFAULT_HEADERS.merge(req.headers))
-        if @no_signal
-          connection.nosignal = true
-        end
+        connection.nosignal = true if @no_signal
 
         response_headers = {}
 
@@ -61,6 +59,11 @@ module Songkick
           connection.__send__("http_#{req.verb}", req.body)
         else
           connection.http(req.verb.upcase)
+        end
+
+        if self.instrumenter
+          self.instrumentation_payload_extras[:connect_time] = connection.connect_time
+          self.instrumentation_payload_extras[:name_lookup_time] = connection.name_lookup_time
         end
 
         process(req, connection.response_code, response_headers, connection.body_str)
@@ -90,4 +93,3 @@ module Songkick
 
   end
 end
-

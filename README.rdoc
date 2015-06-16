@@ -257,8 +257,7 @@ types into an <tt>IO</tt> for you:
 You can then use this to forward uploaded files to another service from your
 Rails or Sinatra application.
 
-
-=== Logging and reporting
+=== Logging, instrumentation and reporting
 
 You can enable basic logging by supplying a logger and switching logging on.
 
@@ -286,15 +285,15 @@ exclude headers used for authentication:
 
 There is also a more advanced reporting system that lets you aggregate request
 statistics. During a request to a web application, many requests to backend
-services may be involved. The repoting system lets you collect information about
-all the backend requests that happened while executing a block. For example you
-can use it to create a logging middleware:
+services may be involved. The reporting system lets you collect information
+about all the backend requests that happened while executing a block. For
+example you can use it to create a logging middleware:
 
     class Reporter
       def initialize(app)
         @app = app
       end
-      
+
       def call(env)
         report = Songkick::Transport.report
         response = report.execute { @app.call(env) }
@@ -317,6 +316,11 @@ following API:
 
 The +report+ object itself also responds to +total_duration+, which gives you
 the total time spent calling backend services during the block.
+
+To instrument transports using the `ActiveSupport::Notifications` API, pass
+`{:instrumenter => ActiveSupport::Notifications}` in the options. You can also
+override the default event label of `http.songkick_transport` by passing
+`:instrumentation_label`.
 
 == Writing Service classes
 

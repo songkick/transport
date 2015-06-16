@@ -1,7 +1,27 @@
 require "spec_helper"
 
 describe Songkick::Transport::Base do
-  subject{ Songkick::Transport::Base.new }
+  let(:host) { 'base' }
+  subject { described_class.new(host) }
+
+
+  describe 'Instrumentation' do
+    subject { described_class.new(host, options) }
+
+    let(:options) do
+      { :instrumenter => ActiveSupport::Notifications }
+    end
+
+    context 'given a custom instrumentation label' do
+      before { options[:instrumentation_label] = 'a.custom.label' }
+
+      it 'instruments the request with the custom label' do
+        allow(subject).to receive(:execute_request)
+        expect(options[:instrumenter]).to receive(:instrument).with(options[:instrumentation_label], anything)
+        subject.get('/')
+      end
+    end
+  end
 
   describe "Decoration" do
 
