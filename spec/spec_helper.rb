@@ -1,6 +1,7 @@
 require 'rubygems'
 require File.expand_path('../../lib/songkick/transport', __FILE__)
 
+require 'active_support/notifications'
 require 'logger'
 require 'sinatra'
 require 'thin'
@@ -16,6 +17,10 @@ class TestApp < Sinatra::Base
 
   get('/')  { Yajl::Encoder.encode(params) }
   post('/') { Yajl::Encoder.encode(params) }
+
+  not_found do
+    halt 404, '{"error": "not found"}'
+  end
 
   get '/invalid' do
     '}'

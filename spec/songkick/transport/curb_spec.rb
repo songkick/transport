@@ -4,7 +4,7 @@ module Songkick
   module Transport
 
     describe Curb do
-      after { Songkick::Transport::Curb.clear_thread_connection }
+      after { described_class.clear_thread_connection }
 
       subject { described_class.new('localhost', :connection => curl) }
       let(:request) { Request.new('http://localhost', 'get', '/', {}) }

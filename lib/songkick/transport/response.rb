@@ -1,6 +1,6 @@
 module Songkick
   module Transport
-    
+
     class Response
       def self.process(request, status, headers, body, user_error_codes=409)
         case status.to_i
@@ -23,26 +23,25 @@ module Songkick
         content_type = (content_type || '').split(/\s*;\s*/).first
         Transport.parser_for(content_type).parse(body)
       end
-      
+
       attr_reader :body, :data, :headers, :status
-      
+
       def initialize(status, headers, body)
         @body    = body
         @data    = Response.parse(body, headers['Content-Type'])
         @headers = Headers.new(headers)
         @status  = status.to_i
       end
-      
+
       def errors
         data && data['errors']
       end
-    
+
       class OK        < Response ; end
       class Created   < Response ; end
       class NoContent < Response ; end
       class UserError < Response ; end
     end
-    
+
   end
 end
-
