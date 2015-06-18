@@ -67,10 +67,12 @@ module Songkick
         instrument(req) do |payload|
           begin
             req.response = execute_request(req)
-            payload.merge!({ :status => req.response.status }) if req.response
+            payload.merge!({ :status => req.response.status,
+                             :response_headers => req.response.headers.to_hash }) if req.response
           rescue => error
             req.error = error
-            payload.merge!({ :status => error.status }) if error.is_a?(HttpError)
+            payload.merge!({ :status => error.status,
+                             :response_headers => error.headers.to_hash }) if error.is_a?(HttpError)
             Reporting.record(req)
             raise error
           ensure
@@ -105,7 +107,7 @@ module Songkick
                       :verb => request.verb,
                       :path => request.path,
                       :params => request.params,
-                      :headers => request.headers }
+                      :request_headers => request.headers.to_hash }
 
           self.instrumenter.instrument(@instrumentation_label, payload) do
             yield(payload)

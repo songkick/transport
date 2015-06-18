@@ -169,7 +169,9 @@ shared_examples_for "Songkick::Transport" do
       let(:expected_payload) do
         hash_including(:adapter => /#{described_class.to_s}/,
                        :path => path, :endpoint => transport.endpoint,
-                       :params => {}, :verb => 'get', :status => 200)
+                       :params => {}, :verb => 'get', :status => 200,
+                       :request_headers => an_instance_of(Hash),
+                       :response_headers => an_instance_of(Hash))
       end
 
 
@@ -185,7 +187,9 @@ shared_examples_for "Songkick::Transport" do
       let(:expected_payload) do
         hash_including(:adapter => /#{described_class.to_s}/,
                        :path => path, :endpoint => transport.endpoint,
-                       :params => {}, :verb => 'post', :status => 404)
+                       :params => {}, :verb => 'post', :status => 404,
+                       :request_headers => an_instance_of(Hash),
+                       :response_headers => an_instance_of(Hash))
       end
 
       it 'instruments the request' do
