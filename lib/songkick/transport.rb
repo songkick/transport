@@ -17,6 +17,7 @@ module Songkick
     ROOT = File.expand_path('..', __FILE__)
 
     autoload :Serialization,    ROOT + '/transport/serialization'
+    autoload :Authorization,    ROOT + '/transport/authorization'
     autoload :Base,             ROOT + '/transport/base'
     autoload :Curb,             ROOT + '/transport/curb'
     autoload :Headers,          ROOT + '/transport/headers'
