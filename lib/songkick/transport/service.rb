@@ -2,7 +2,6 @@ module Songkick
   module Transport
     class Service
       DEFAULT_TIMEOUT = 10
-      DEFAULT_TRANSPORT = Songkick::Transport::Curb
 
       def self.ancestor
         warn "DEPRECATED: calling ancestor on #{self}"
@@ -73,7 +72,7 @@ module Songkick
       end
 
       def self.get_transport_layer
-        @transport_layer || (parent_service && parent_service.get_transport_layer) || DEFAULT_TRANSPORT
+        @transport_layer || (parent_service && parent_service.get_transport_layer) || Songkick::Transport::Curb
       end
 
       def self.get_transport_layer_options
