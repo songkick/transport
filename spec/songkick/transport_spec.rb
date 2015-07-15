@@ -283,7 +283,7 @@ describe Songkick::Transport do
   describe "registering parsers" do
     context "for JSON" do
       it 'should use the JSON parser' do
-        expect(described_class.parser_for('application/json')).to eq(Yajl::Parser)
+        expect(described_class.parser_for('application/json')).to eq(JSON)
       end
     end
 
@@ -320,7 +320,7 @@ describe Songkick::Transport do
 
           it 'should return the already defined parser if specified' do
             expect(described_class.parser_for('application/xml')).to eq(:my_parser)
-            expect(described_class.parser_for('application/json')).to eq(Yajl::Parser)
+            expect(described_class.parser_for('application/json')).to eq(JSON)
           end
         end
       end

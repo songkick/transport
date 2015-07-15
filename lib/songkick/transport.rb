@@ -2,7 +2,7 @@ require 'forwardable'
 require 'net/http'
 require 'net/http/post/multipart'
 require 'uri'
-require 'yajl'
+require 'json'
 
 module Songkick
   module Transport
@@ -51,7 +51,7 @@ module Songkick
       parser
     end
 
-    register_parser 'application/json', Yajl::Parser
+    register_parser 'application/json', JSON
 
     IO = UploadIO
 

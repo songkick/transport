@@ -2,12 +2,12 @@ module Songkick
   module Transport
     class HttpError < UpstreamError
       attr_reader :request, :data, :headers, :status
-      
+
       def initialize(request, status, headers, body)
         @request = request
 
         @data = if body.is_a?(String)
-                  body.strip == '' ? nil : (Yajl::Parser.parse(body) rescue body)
+                  body.strip == '' ? nil : (JSON.parse(body) rescue body)
                 else
                   body
                 end

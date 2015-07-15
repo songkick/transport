@@ -11,7 +11,7 @@ module Songkick
         else
           raise HttpError.new(request, status, headers, body)
         end
-      rescue Yajl::ParseError
+      rescue JSON::ParserError
         Transport.logger.warn "Request returned invalid JSON: #{request}"
         raise Transport::InvalidJSONError, request
       end
