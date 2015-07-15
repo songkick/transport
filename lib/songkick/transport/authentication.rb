@@ -2,7 +2,7 @@ require "base64"
 
 module Songkick
   module Transport
-    module Authorization
+    module Authentication
       
       extend self
       

@@ -66,7 +66,7 @@ module Songkick
       end
 
       def do_verb(verb, path, params = {}, head = {}, timeout = nil)
-        auth_headers = basic_auth ? Authorization.basic_auth_headers(basic_auth) : {}
+        auth_headers = basic_auth ? Authentication.basic_auth_headers(basic_auth) : {}
         req = Request.new(endpoint, verb, path, params, headers.merge(auth_headers).merge(head), timeout)
         Reporting.log_request(req)
 
@@ -174,7 +174,7 @@ module Songkick
         include API
 
         def do_verb(verb, path, params = {}, headers = {}, timeout = nil)
-          auth_headers = Authorization.basic_auth_headers(credentials)
+          auth_headers = Authentication.basic_auth_headers(credentials)
           client.do_verb(verb, path, params, auth_headers.merge(headers), timeout)
         end
 
