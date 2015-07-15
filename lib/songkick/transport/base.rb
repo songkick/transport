@@ -67,7 +67,7 @@ module Songkick
 
       def do_verb(verb, path, params = {}, head = {}, timeout = nil)
         auth_headers = basic_auth ? Authorization.basic_auth_headers(basic_auth) : {}
-        req = Request.new(endpoint, verb, path, params, headers.merge(head).merge(auth_headers), timeout)
+        req = Request.new(endpoint, verb, path, params, headers.merge(auth_headers).merge(head), timeout)
         Reporting.log_request(req)
 
         instrument(req) do |payload|
@@ -175,7 +175,7 @@ module Songkick
 
         def do_verb(verb, path, params = {}, headers = {}, timeout = nil)
           auth_headers = Authorization.basic_auth_headers(credentials)
-          client.do_verb(verb, path, params, headers.merge(auth_headers), timeout)
+          client.do_verb(verb, path, params, auth_headers.merge(headers), timeout)
         end
 
         def method_missing(*args, &block)

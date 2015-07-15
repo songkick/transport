@@ -10,7 +10,7 @@ module Songkick
         username = credentials.fetch(:username)
         password = credentials.fetch(:password)
         encoded_creds = Base64.strict_encode64("#{username}:#{password}")
-        {"Authorization" => "Basic #{encoded_creds}"}
+        Headers.new({"Authorization" => "Basic #{encoded_creds}"})
       end
     
     end
