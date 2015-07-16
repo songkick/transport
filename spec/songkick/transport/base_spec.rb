@@ -23,6 +23,25 @@ describe Songkick::Transport::Base do
     end
   end
 
+  describe 'Basic auth' do
+    subject { described_class.new(host, options) }
+    let(:options) {{}}
+
+    context 'given basic auth credentials' do
+      before { options[:basic_auth] =  {:username => "foo", :password => "baz"} }
+
+      it 'should add basic auth credentials to subsequent requests' do
+        expect(subject).to receive(:execute_request) do |request|
+          expected_headers = {"Authorization"=>"Basic Zm9vOmJheg=="}
+          expect(request.headers).to include(expected_headers)
+          Songkick::Transport::Response::NoContent.new(204, {}, "")
+        end
+
+        subject.get('/')
+      end
+    end
+  end
+
   describe "Decoration" do
 
     it "should let you add headers" do
@@ -97,10 +116,28 @@ describe Songkick::Transport::Base do
       decorated_http.get("/")
     end
 
-    it "THE LOT" do
-      decorated_http = subject.with_headers("Version" => "3.0").with_params("foo" => "123").with_timeout(10)
+    it "should let you add basic authorization" do
+      decorated_http = subject.with_basic_auth({:username => "foo", :password => "bar"})
+      expected_auth_headers = {"Authorization" => "Basic Zm9vOmJhcg=="}
 
-      expect(subject).to receive(:do_verb).with("get", "/", {"foo" => "123"}, Songkick::Transport::Headers.new("Version" => "3.0"), 10)
+      expect(subject).to receive(:do_verb).with("get", "/", {}, Songkick::Transport::Headers.new(expected_auth_headers), nil)
+
+      decorated_http.get("/")
+    end
+
+    it "should let you add basic authorization and merge them with other headers created by HeaderDecorator" do
+      decorated_http = subject.with_headers({"hello" => "world"}).with_basic_auth({:username => "foo", :password => "bar"})
+      expected_headers = {"Authorization" => "Basic Zm9vOmJhcg==", "hello" => "world"}
+
+      expect(subject).to receive(:do_verb).with("get", "/", {}, Songkick::Transport::Headers.new(expected_headers), nil)
+
+      decorated_http.get("/")
+    end
+
+    it "THE LOT" do
+      decorated_http = subject.with_basic_auth({:username => "foo", :password => "bar"}).with_headers("Version" => "3.0").with_params("foo" => "123").with_timeout(10)
+
+      expect(subject).to receive(:do_verb).with("get", "/", {"foo" => "123"}, Songkick::Transport::Headers.new("Version" => "3.0", "Authorization" => "Basic Zm9vOmJhcg=="), 10)
 
       decorated_http.get("/")
     end

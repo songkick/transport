@@ -42,12 +42,16 @@ module Songkick
         def with_params(params)
           ParamsDecorator.new(self, params)
         end
+
+        def with_basic_auth(credentials)
+          BasicAuthDecorator.new(self, credentials)
+        end
       end
 
       include API
 
       attr_accessor :user_agent, :user_error_codes
-      attr_reader :host, :timeout, :instrumenter
+      attr_reader :host, :timeout, :instrumenter, :basic_auth
       alias_method :endpoint, :host
       DEFAULT_INSTRUMENTATION_LABEL = 'http.songkick_transport'
 
@@ -58,10 +62,12 @@ module Songkick
         @user_error_codes = options[:user_error_codes] || DEFAULT_USER_ERROR_CODES
         @instrumenter ||= options[:instrumenter]
         @instrumentation_label = options[:instrumentation_label] || DEFAULT_INSTRUMENTATION_LABEL
+        @basic_auth = options[:basic_auth]
       end
 
       def do_verb(verb, path, params = {}, head = {}, timeout = nil)
-        req = Request.new(endpoint, verb, path, params, headers.merge(head), timeout)
+        auth_headers = basic_auth ? Authentication.basic_auth_headers(basic_auth) : {}
+        req = Request.new(endpoint, verb, path, params, headers.merge(auth_headers).merge(head), timeout)
         Reporting.log_request(req)
 
         instrument(req) do |payload|
@@ -157,6 +163,19 @@ module Songkick
 
         def do_verb(verb, path, new_params = {}, headers = {}, timeout = nil)
           client.do_verb(verb, path, params.merge(new_params), headers, timeout)
+        end
+
+        def method_missing(*args, &block)
+          client.__send__(*args, &block)
+        end
+      end
+
+      class BasicAuthDecorator < Struct.new(:client, :credentials)
+        include API
+
+        def do_verb(verb, path, params = {}, headers = {}, timeout = nil)
+          auth_headers = Authentication.basic_auth_headers(credentials)
+          client.do_verb(verb, path, params, auth_headers.merge(headers), timeout)
         end
 
         def method_missing(*args, &block)
