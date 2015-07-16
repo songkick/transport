@@ -1,7 +1,5 @@
 = Songkick::Transport {<img src="https://secure.travis-ci.org/songkick/transport.png?branch=master" />}[http://travis-ci.org/songkick/transport]
 
-http://songkickontour.appspot.com/lego_tourbus.png
-
 This is a transport layer abstraction for talking to our service APIs. It
 provides an abstract HTTP-like interface while hiding the underlying transport
 and serialization details. It transparently deals with parameter serialization,
@@ -61,7 +59,8 @@ takes a reference to a Rack application, for example:
     
     client = Transport.new(Sinatra::Application,
                            :user_agent => 'Test Agent',
-                           :timeout    => 5)
+                           :timeout    => 5,
+                           :basic_auth => {:username => "foo", :password => "bar"})
 
 All transports expose exactly the same instance methods.
 
@@ -177,7 +176,7 @@ Rails and Sinatra will parse this back into the original data structure for you
 on the server side.
 
 
-=== Request headers and timeouts
+=== Request headers, timeouts and basic auth
 
 You can make requests with custom headers using +with_headers+. The return value
 of +with_headers+ works just like a client object, so you can use it for
@@ -194,6 +193,10 @@ of input from the front end. For example, +HTTP_USER_AGENT+ is converted to
 Similarly, the request timeout can be adjusted per-request:
 
     client.with_timeout(10).get('/slow_resource')
+
+Likewise basic auth credentials:
+
+    client.with_basic_auth({:username => "foo", :password => "bar"}).get('/')
 
 
 === File uploads

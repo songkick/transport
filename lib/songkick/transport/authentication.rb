@@ -15,7 +15,11 @@ module Songkick
 
       # Base64.strict_encode64 is not available on Ruby 1.8.7
       def strict_encode64(str)
-        Base64.encode64(str).gsub("\n", '')
+        if Base64.respond_to?(:strict_encode64)
+          Base64.strict_encode64(str)
+        else
+          Base64.encode64(str).gsub("\n", '')
+        end
       end
     
     end
