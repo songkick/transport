@@ -20,7 +20,7 @@ Gem::Specification.new do |s|
 
   s.add_development_dependency "activesupport", ">= 3.0.0"
   s.add_development_dependency "curb", ">= 0.3.0"
-  s.add_development_dependency "httparty", ">= 0.4.0"
+  s.add_development_dependency "httparty", ">= 0.8.0"
   s.add_development_dependency "rack-test", ">= 0.4.0"
 
   s.add_development_dependency "rake"
