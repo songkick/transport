@@ -8,14 +8,14 @@ module Songkick
 
       let(:request){ Request.new('http://localhost', 'get', '/', {}) }
 
-      describe "handling errors" do
+      describe 'handling errors' do
         class FakeHttparty < Songkick::Transport::HttParty::Adapter
           class << self
             attr_accessor :error
           end
 
           def self.get(path, args)
-            raise(error, "bang") if error
+            raise(error, 'bang') if error
           end
 
         end
@@ -41,7 +41,7 @@ module Songkick
           end
         end
 
-        describe "handling errors" do
+        describe 'handling errors' do
           when_request_raises_the_exception(FakeJSONException) { it_should_raise(Transport::InvalidJSONError)      }
           when_request_raises_the_exception(SocketError)       { it_should_raise(Transport::ConnectionFailedError) }
           when_request_raises_the_exception(Timeout::Error)    { it_should_raise(Transport::TimeoutError)          }
@@ -49,7 +49,7 @@ module Songkick
           when_request_raises_the_exception(Exception)         { it_should_raise(Transport::UpstreamError)         }
         end
 
-        describe "headers parsing" do
+        describe 'headers parsing' do
           let(:httparty) { Songkick::Transport::HttParty.new('localhost') }
           let(:request) { Request.new('http://localhost:4567', 'get', '/with_headers', {}) }
 
@@ -61,9 +61,9 @@ module Songkick
             TestApp.stop
           end
 
-          it "should join multiple headers to one" do
+          it 'should join multiple headers to one' do
             response = httparty.execute_request(request)
-            expect(response.headers["Set-Cookie"]).to eq "a, b"
+            expect(response.headers['Set-Cookie']).to eq 'a, b'
           end
         end
       end
