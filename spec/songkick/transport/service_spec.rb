@@ -1,13 +1,13 @@
 require "spec_helper"
 
 describe Songkick::Transport::Service do
-  let(:http) { double(Songkick::Transport::Curb) }
+  let(:http) { double(described_class::DEFAULT_TRANSPORT) }
 
   before do
     described_class.set_endpoints 'foo' => 'nonsuch:1111'
     described_class.user_agent described_class.to_s
 
-    allow(Songkick::Transport::Curb).to receive(:new).and_return(http)
+    allow(described_class::DEFAULT_TRANSPORT).to receive(:new).and_return(http)
     allow(http).to receive(:with_headers).and_return(http)
   end
 
@@ -51,18 +51,18 @@ describe Songkick::Transport::Service do
       end
 
       it "global options can be specified and are passed to the transport initializer" do
-        expect(Songkick::Transport::Curb).to receive(:new).with(anything, hash_including(global_options))
+        expect(described_class::DEFAULT_TRANSPORT).to receive(:new).with(anything, hash_including(global_options))
         B.new.http
       end
 
       it "options can be specified per-class and are passed to the transport initializer" do
-        expect(Songkick::Transport::Curb).to receive(:new).with(anything, hash_including(upper_options))
+        expect(described_class::DEFAULT_TRANSPORT).to receive(:new).with(anything, hash_including(upper_options))
         A.new.http
       end
 
       it "options can be overridden per-class and are passed to the transport initializer" do
-        expect(Songkick::Transport::Curb).not_to receive(:new).with(anything, hash_including(upper_options))
-        expect(Songkick::Transport::Curb).to receive(:new).with(anything, hash_including(lower_options))
+        expect(described_class::DEFAULT_TRANSPORT).not_to receive(:new).with(anything, hash_including(upper_options))
+        expect(described_class::DEFAULT_TRANSPORT).to receive(:new).with(anything, hash_including(lower_options))
         B.new.http
       end
     end
