@@ -1,5 +1,6 @@
 require 'cgi'
-require 'curb'
+
+autoload :Curl, 'curb'
 
 module Songkick
   module Transport
