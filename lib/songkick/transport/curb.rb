@@ -51,7 +51,12 @@ module Songkick
           line = header_line.sub(/\r\n$/, '')
           parts = line.split(/:\s*/)
           if parts.size >= 2
-            response_headers[parts.shift] = parts * ':'
+            header_name, value = parts.shift, parts * ':'
+            if response_headers[header_name]
+              response_headers[header_name] << ", #{value}"
+            else
+              response_headers[header_name] = value
+            end
           end
           header_line.bytesize
         end

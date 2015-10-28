@@ -26,6 +26,11 @@ class TestApp < Sinatra::Base
     '}'
   end
 
+  get '/with_headers' do
+    headers 'Set-Cookie' => ['a', 'b']
+    '{}'
+  end
+
   get '/authenticate' do
     env['HTTP_AUTHORIZATION'] ?
         Yajl::Encoder.encode('successful' => true) :
