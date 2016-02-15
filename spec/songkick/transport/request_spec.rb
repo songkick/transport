@@ -59,6 +59,22 @@ describe Songkick::Transport::Request do
         end
       end
     end
+    
+    describe "with a long post body" do
+      let :params do
+        {
+          :username => "a" * 5000, 
+          :foo => "bar", 
+          :access => {:token => "b" * 5000}
+        }
+      end
+
+      it "truncates the long parameter values" do
+        pattern = %r{^POST 'www.example.com/' -H 'Content-Type: application/x-www-form-urlencoded' -d '([^']+)'$}
+        expect(post_request.to_s).to match(pattern)
+        expect(query(post_request, pattern)).to eq(["access[token]=#{"b" * 500}[TRUNCATED]", "foo=bar", "username=#{"a" * 500}[TRUNCATED]"])
+      end
+    end
   end
 end
 
