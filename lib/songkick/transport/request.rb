@@ -68,6 +68,7 @@ module Songkick
         Serialization.build_url(@verb, @endpoint, @path, @params)
       end
 
+      TRUNCATED_PARAM_LENGTH = 500
       def to_s
         url = String === @endpoint ?
               Serialization.build_url(@verb, @endpoint, @path, @params, true) :
@@ -79,7 +80,17 @@ module Songkick
           command << " -H '#{key}: #{value}'"
         end
         return command unless use_body?
-        query = Serialization.build_query_string(params, true, true)
+        sanitized_params = Serialization.build_query_string(params, false, true)
+        sanitized_params = sanitized_params.inject({}) do |result, param|
+          key, value = param
+          if value.length > TRUNCATED_PARAM_LENGTH
+            result[key] = "#{value[0...TRUNCATED_PARAM_LENGTH]}[TRUNCATED]"
+          else
+            result[key] = value
+          end
+          result
+        end
+        query = sanitized_params.map { |p| p.join('=') }.join('&')
         command << " -d '#{query}'"
         command
       end
