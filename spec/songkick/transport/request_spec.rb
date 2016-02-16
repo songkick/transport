@@ -64,7 +64,7 @@ describe Songkick::Transport::Request do
       let :params do
         {
           :username => "a" * 5000, 
-          :password => "CK", 
+          :foo => "bar", 
           :access => {:token => "b" * 5000}
         }
       end
@@ -72,8 +72,7 @@ describe Songkick::Transport::Request do
       it "truncates the long parameter values" do
         pattern = %r{^POST 'www.example.com/' -H 'Content-Type: application/x-www-form-urlencoded' -d '([^']+)'$}
         expect(post_request.to_s).to match(pattern)
-        expect(post_request.to_s).to match(/username=a{500}\[TRUNCATED\]/)
-        expect(post_request.to_s).to match(/access\[token\]=b{500}\[TRUNCATED\]/)
+        expect(query(post_request, pattern)).to eq(["access[token]=#{"b" * 500}[TRUNCATED]", "foo=bar", "username=#{"a" * 500}[TRUNCATED]"])
       end
     end
   end
