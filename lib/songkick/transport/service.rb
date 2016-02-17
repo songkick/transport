@@ -107,8 +107,11 @@ module Songkick
 
       def http
         r = (@http ||= self.class.new_transport)
-        r.with_headers(self.class.get_with_headers) if !self.class.get_with_headers.empty?
-        r
+        if self.class.get_with_headers.any?
+          r.with_headers(self.class.get_with_headers)
+        else
+          r
+        end
       end
 
       def stub_transport(http)
