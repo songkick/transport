@@ -252,7 +252,34 @@ shared_examples_for "Songkick::Transport" do
       expect(transport.user_error_codes).to eq([409])
     end
   end
+end
 
+shared_examples_for "Songkick::Transport::HttpAdapter" do
+  describe 'multiple instances of the adapter' do
+    let!(:first_adapter) { described_class.new('http://localhost:8181') }
+    let!(:second_adapter) { described_class.new('http://localhost:8282') }
+
+    before do
+      @first_test_app = TestApp.listen(8181)
+      @second_test_app = TestApp.listen(8282)
+    end
+
+    after do
+      @first_test_app.stop
+      @second_test_app.stop
+      sleep 1
+    end
+
+    it 'should have the right endpoint on each adapter' do
+      expect(first_adapter.endpoint).to eq('http://localhost:8181')
+      expect(second_adapter.endpoint).to eq('http://localhost:8282')
+    end
+
+    it 'should call the right endpoint on each adapter' do
+      expect(first_adapter.get('/host').data).to eq({"host" => "localhost:8181"})
+      expect(second_adapter.get('/host').data).to eq({"host" => "localhost:8282"})
+    end
+  end
 end
 
 # Curb always times out talking to the web server in the other thread when run on 1.8
@@ -262,6 +289,7 @@ unless RUBY_VERSION =~ /^1.8/
     let(:endpoint)  { "http://localhost:4567" }
     let(:transport) { described_class.new(endpoint, options) }
     it_should_behave_like "Songkick::Transport"
+    it_should_behave_like "Songkick::Transport::HttpAdapter"
   end
 end
 
@@ -270,6 +298,7 @@ describe Songkick::Transport::HttParty do
   let(:endpoint)  { "http://localhost:4567" }
   let(:transport) { described_class.new(endpoint, options) }
   it_should_behave_like "Songkick::Transport"
+  it_should_behave_like "Songkick::Transport::HttpAdapter"
 end
 
 describe Songkick::Transport::RackTest do

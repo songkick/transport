@@ -6,7 +6,6 @@ module Songkick
     class HttParty
       def self.new(host, options = {})
         adapter_class = options.delete(:adapter) || Adapter
-        adapter_class.base_uri(host)
         adapter_class.format(options[:format] || DEFAULT_FORMAT)
         adapter_class.default_timeout(options[:timeout] || DEFAULT_TIMEOUT)
         adapter_class.new(host, options)
@@ -16,16 +15,22 @@ module Songkick
         include HTTParty
 
         def endpoint
-          self.class.base_uri
+          @host
         end
 
         def execute_request(req)
           timeout = req.timeout || self.class.default_options[:timeout]
 
+          req_options = {
+            :base_uri => @host,
+            :headers => req.headers,
+            :timeout => timeout
+          }
+
           response = if req.use_body?
-            self.class.__send__(req.verb, req.path, :body => req.body, :headers => req.headers, :timeout => timeout)
+            self.class.__send__(req.verb, req.path, req_options.merge(:body => req.body))
           else
-            self.class.__send__(req.verb, req.url, :headers => req.headers, :timeout => timeout)
+            self.class.__send__(req.verb, req.url, req_options)
           end
 
           process(req, response.code, response.headers, response.parsed_response)

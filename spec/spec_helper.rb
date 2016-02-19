@@ -26,6 +26,10 @@ class TestApp < Sinatra::Base
     '}'
   end
 
+  get '/host' do
+    Yajl::Encoder.encode({"host" => request.env["HTTP_HOST"]})
+  end
+
   get '/with_headers' do
     headers 'Set-Cookie' => ['a', 'b']
     '{}'
@@ -89,6 +93,7 @@ class TestApp < Sinatra::Base
     thin = Rack::Handler.get('thin')
     app  = Rack::Lint.new(self)
     thin.run(app, :Port => port) { |s| @server = s }
+    @server
   end
 
   def self.stop
