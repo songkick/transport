@@ -81,6 +81,10 @@ module Songkick
         end
         return command unless use_body?
         sanitized_params = Serialization.build_query_string(params, false, true)
+        if String === sanitized_params
+          command << " -d '#{sanitized_params}'"
+          return command
+        end
         sanitized_params = sanitized_params.inject({}) do |result, param|
           key, value = param
           if value.length > TRUNCATED_PARAM_LENGTH
