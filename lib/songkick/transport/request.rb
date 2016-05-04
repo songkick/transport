@@ -87,7 +87,7 @@ module Songkick
         end
         sanitized_params = sanitized_params.inject({}) do |result, param|
           key, value = param
-          if value.length > TRUNCATED_PARAM_LENGTH
+          if value.respond_to?(:length) && value.length > TRUNCATED_PARAM_LENGTH
             result[key] = "#{value[0...TRUNCATED_PARAM_LENGTH]}[TRUNCATED]"
           else
             result[key] = value
