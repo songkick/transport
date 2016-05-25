@@ -1,10 +1,13 @@
 Gem::Specification.new do |s|
   s.name                  = "songkick-transport"
-  s.version               = "1.10.5"
+  s.version               = "1.11.0"
   s.license               = "MIT"
   s.summary               = "HTTP client abstraction for service clients"
   s.description           = "HTTP client abstraction for service clients"
-  s.authors               = ["Daniel Lucraft", "James Coglan", "Sabrina Leandro", "Robin Tweedie", "Paul Lawson", "Sabina Bejasa-Dimmock", "Paul Springett"]
+  s.authors               = [
+    "Daniel Lucraft", "James Coglan", "Sabrina Leandro", "Robin Tweedie",
+    "Paul Lawson", "Sabina Bejasa-Dimmock", "Paul Springett", "Andy Mitchell"
+  ]
   s.email                 = "developers@songkick.com"
   s.homepage              = "http://github.com/songkick/transport"
   s.required_ruby_version = '>= 1.8.7'

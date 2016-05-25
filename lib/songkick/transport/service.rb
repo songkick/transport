@@ -57,7 +57,13 @@ module Songkick
       end
 
       def self.get_endpoint_name
-        @endpoint_name || (parent_service && parent_service.get_endpoint_name)
+        @endpoint_name || (parent_service && parent_service.get_endpoint_name) ||
+          raise("no endpoint specified for #{self}, call endpoint 'foo' inside #{self}")
+      end
+
+      def self.get_endpoint
+        Service.get_endpoints[self.get_endpoint_name] ||
+          raise("can't find endpoint for '#{self.get_endpoint_name}', should have called Songkick::Transport::Service.set_endpoints")
       end
 
       def self.get_timeout
@@ -89,16 +95,10 @@ module Songkick
       end
 
       def self.new_transport
-        unless name = get_endpoint_name
-          raise "no endpoint specified for #{self}, call endpoint 'foo' inside #{self}"
-        end
-        unless endpoint = Service.get_endpoints[name]
-          raise "can't find endpoint for '#{name}', should have called Songkick::Transport::Service.set_endpoints"
-        end
         unless user_agent = get_user_agent
           raise "no user agent specified for #{self}, call user_agent 'foo' inside #{self} or on Songkick::Transport::Service"
         end
-        get_stub_transport || get_transport_layer.new(endpoint, { :user_agent => user_agent, :timeout => get_timeout }.merge(get_transport_layer_options))
+        get_stub_transport || get_transport_layer.new(self.get_endpoint, { :user_agent => user_agent, :timeout => get_timeout }.merge(get_transport_layer_options))
       end
 
       def self.with_headers(headers)

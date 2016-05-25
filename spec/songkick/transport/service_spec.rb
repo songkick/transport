@@ -11,6 +11,37 @@ describe Songkick::Transport::Service do
     allow(http).to receive(:with_headers).and_return(http)
   end
 
+  class TestService < Songkick::Transport::Service
+    endpoint :foo
+  end
+
+  class TestServiceWithoutEndpointName < Songkick::Transport::Service
+  end
+
+  class TestServiceWithoutEndpoint < Songkick::Transport::Service
+    endpoint :bar
+  end
+
+  describe '#get_endpoint' do
+    it 'returns the endpoint for the given endpoint name' do
+      expect(TestService.get_endpoint).to eq('nonsuch:1111')
+    end
+
+    it 'raises an error if the endpoint does not exist in the given config' do
+      expect { TestServiceWithoutEndpoint.get_endpoint }.to raise_error
+    end
+  end
+
+  describe '#get_endpoint_name' do
+    it 'returns the endpoint name' do
+      expect(TestService.get_endpoint_name).to eq('foo')
+    end
+
+    it 'raises an error if the endpoint is not given' do
+      expect { TestServiceWithoutEndpointName.get_endpoint_name }.to raise_error
+    end
+  end
+
   describe "given a Service class hierarchy" do
     class A < Songkick::Transport::Service
       endpoint :foo
