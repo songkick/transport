@@ -1,5 +1,7 @@
 source "https://rubygems.org"
 
+# Used to run tests
+
 # Pin to Ruby 1.8.7 compliant versions
 gem "activesupport", "< 4"
 gem "i18n", "< 0.7"
