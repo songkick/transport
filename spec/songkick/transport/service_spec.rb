@@ -28,7 +28,7 @@ describe Songkick::Transport::Service do
     end
 
     it 'raises an error if the endpoint does not exist in the given config' do
-      expect { TestServiceWithoutEndpoint.get_endpoint }.to raise_error
+      expect { TestServiceWithoutEndpoint.get_endpoint }.to raise_error(StandardError)
     end
   end
 
@@ -38,7 +38,7 @@ describe Songkick::Transport::Service do
     end
 
     it 'raises an error if the endpoint is not given' do
-      expect { TestServiceWithoutEndpointName.get_endpoint_name }.to raise_error
+      expect { TestServiceWithoutEndpointName.get_endpoint_name }.to raise_error(StandardError)
     end
   end
 
