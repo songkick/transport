@@ -59,8 +59,8 @@ module Songkick
       def sanitize?(key)
         Transport.sanitized_params.any? { |param| param === key }
       end
-
-      def serialize_multipart(params, boundary = Multipartable::DEFAULT_BOUNDARY)
+      
+      def serialize_multipart(params, boundary = Multipartable.secure_boundary)
         params = build_query_string(params, false)
 
         parts = params.map { |k,v| Parts::Part.new(boundary, k, v) }
