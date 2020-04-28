@@ -1,0 +1,18 @@
+version: '3.5'
+
+services:
+  app_dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - SONGKICK_ENV=development
+    volumes:
+      - .:/app
+
+  app_test:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - SONGKICK_ENV=test
