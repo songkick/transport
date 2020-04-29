@@ -19,10 +19,10 @@ module Songkick
         return unless error_counter
         error_counter.increment(
           labels: {
-            error: error.class,
-            endpoint: req.endpoint,
-            path: req.path,
-            verb: req.verb
+            error:          Metrics.error_name(error),
+            target_service: Metrics.service_name(req.endpoint),
+            path:           Metrics.sanitize_path(req.path),
+            verb:           req.verb
           }
         )
       end
@@ -32,13 +32,29 @@ module Songkick
           return nil unless defined? Prometheus::Client
           registry = Prometheus::Client.registry
           counter = Prometheus::Client::Counter.new(
-            :http_errors,
+            :transport_errors,
             docstring: 'A counter of HTTP errors',
-            labels: [:error, :endpoint, :path, :verb]
+            labels: [:error, :target_service, :path, :verb]
           )
           registry.register(counter)
           counter
         end
+      end
+
+      def self.service_name(endpoint)
+        Service.get_endpoints.key(endpoint) || endpoint
+      end
+
+      def self.sanitize_path(path)
+        path_array = path.sub(/^\//, '').split('/')
+        path_array.map! do |part|
+          part.gsub(/\d+/, '_id')
+        end
+        path_array.join('.')
+      end
+
+      def self.error_name(error)
+        error.class.name.split('::').last
       end
     end
   end
