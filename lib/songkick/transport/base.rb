@@ -80,6 +80,9 @@ module Songkick
             payload.merge!({ :status => error.status,
                              :response_headers => error.headers.to_hash }) if error.is_a?(HttpError)
             Reporting.record(req)
+
+            Metrics.log(error, req)
+
             raise error
           ensure
             payload.merge!(self.instrumentation_payload_extras)

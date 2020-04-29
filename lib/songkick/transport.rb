@@ -34,6 +34,7 @@ module Songkick
     autoload :ConnectionFailedError, ROOT + '/transport/upstream_error'
     autoload :InvalidJSONError,      ROOT + '/transport/upstream_error'
     autoload :HttpError,             ROOT + '/transport/http_error'
+    autoload :Metrics,               ROOT + '/transport/metrics'
 
     def self.register_parser(content_type, parser)
       @parsers ||= {}

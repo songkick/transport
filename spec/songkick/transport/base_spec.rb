@@ -143,4 +143,14 @@ describe Songkick::Transport::Base do
     end
 
   end
+
+  describe 'Metrics' do
+    context 'when an error occurs' do
+      it 'logs the error as a metric' do
+        allow(subject).to receive(:execute_request).and_raise(Songkick::Transport::TimeoutError.new(nil))
+        expect(Songkick::Transport::Metrics).to receive(:log)
+        expect { subject.get('/') }.to raise_error(Songkick::Transport::TimeoutError)
+      end
+    end
+  end
 end
