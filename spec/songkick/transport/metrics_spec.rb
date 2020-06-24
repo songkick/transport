@@ -42,7 +42,7 @@ describe Songkick::Transport::Metrics do
       })
     end
 
-    context 'when there is no prometheus counter' do
+    context 'when there is no songkick-instruments counter' do
       let(:error_counter) { nil }
 
       it 'does not error' do
@@ -50,8 +50,8 @@ describe Songkick::Transport::Metrics do
       end
     end
 
-    context 'when there is a prometheus counter' do
-      let(:error_counter) { double('Prometheus::Client::Counter') }
+    context 'when there is a songkick-instruments counter' do
+      let(:error_counter) { double('Songkick::Instruments.counter') }
 
       it 'increments it with the request information' do
         expect(error_counter).to receive(:increment).with(labels: hash_including(
@@ -82,34 +82,15 @@ describe Songkick::Transport::Metrics do
   end
 
   describe '.error_counter' do
-    context 'when the containing project does not include the Prometheus Client library' do
+    context 'when the containing project does not include songkick-instruments' do
       it 'returns nil' do
         expect(subject.error_counter).to be_nil
       end
     end
 
-    context 'when the containing project includes the Prometheus Client library' do
-      let(:registry) { double('Prometheus::Client::Registry') }
-      let(:counter) { double('Prometheus::Client::Counter') }
-      let(:client_class) { class_double('Prometheus::Client').as_stubbed_const(transfer_nested_constants: true) }
-      let(:counter_class) { class_double('Prometheus::Client::Counter').as_stubbed_const(transfer_nested_constants: true) }
-      before do
-        allow(client_class).to receive(:registry).and_return(registry)
-      end
-
-      it 'creates the counter and registers it' do
-        expect(counter_class).to receive(:new).and_return(counter)
-        expect(registry).to receive(:register).with(counter)
-
-        subject.error_counter
-      end
-
-      it 'does not recreate the counter when subsequent metrics are logged' do
-        subject.error_counter
-
-        expect(counter_class).not_to receive(:new)
-        expect(registry).not_to receive(:register)
-
+    context 'when the containing project includes songkick-instruments' do
+      let(:counter) { double('Songkick::Instruments.counter') }
+      it 'creates the counter' do
         subject.error_counter
       end
     end

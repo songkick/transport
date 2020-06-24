@@ -29,14 +29,12 @@ module Songkick
 
       def self.error_counter
         @error_counter ||= begin
-          return nil unless defined? Prometheus::Client
-          registry = Prometheus::Client.registry
-          counter = Prometheus::Client::Counter.new(
+          return nil unless defined? Songkick::Instruments
+          counter = Songkick::Instruments.counter(
             :transport_errors,
             docstring: 'A counter of HTTP errors',
             labels: [:error, :target_service, :path, :verb]
           )
-          registry.register(counter)
           counter
         end
       end
