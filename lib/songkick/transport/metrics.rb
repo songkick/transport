@@ -4,7 +4,8 @@ module Songkick
       METRIC_ERRORS = [
         HostResolutionError,
         ConnectionFailedError,
-        TimeoutError
+        TimeoutError,
+        HttpError
       ]
 
       def self.log(error, req)
