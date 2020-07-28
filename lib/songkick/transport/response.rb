@@ -28,8 +28,8 @@ module Songkick
 
       def initialize(status, headers, body)
         @body    = body
-        @data    = Response.parse(body, headers['Content-Type'])
         @headers = Headers.new(headers)
+        @data    = Response.parse(body, @headers['content-type'])
         @status  = status.to_i
       end
 

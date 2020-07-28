@@ -30,8 +30,20 @@ describe Songkick::Transport::Response do
   end
   
   describe "200 with a parsed body" do
-    let(:response) { process("", 200, {"Content-Type" => "application/json"}, {"hello" => "world"}) }
+    let(:response) { process("", 200, {"Content-Type" => "application/json"}, '{"hello": "world"}') }
     
+    it "exposes its data" do
+      expect(response.data).to eq({"hello" => "world"})
+    end
+  end
+
+  describe "200 with a lowercase content type" do
+    let(:response) { process("", 200, {"content-type" => "application/json"}, '{"hello":"world"}') }
+    
+    it "has the correct content type" do
+      expect(response.headers['content-type']).to eq("application/json")
+    end
+
     it "exposes its data" do
       expect(response.data).to eq({"hello" => "world"})
     end
