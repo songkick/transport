@@ -15,10 +15,7 @@ help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
 pull_songkick_ruby:
-	docker run --rm \
-	-v /var/run/docker.sock:/var/run/docker.sock \
-	-v ~/.config/soundbadger/gcloud:/root/.config/gcloud \
-	google/cloud-sdk:latest gcloud docker -- pull eu.gcr.io/soundbadger-management/songkick-ruby:2.6
+	docker pull eu.gcr.io/soundbadger-management/songkick-ruby:2.6
 
 build: ## build locally
 	rm -fr .bundle
