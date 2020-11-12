@@ -4,16 +4,25 @@ module Songkick
       METRIC_ERRORS = [
         HostResolutionError,
         ConnectionFailedError,
-        TimeoutError
+        TimeoutError,
+        HttpError
       ]
 
       def self.log(error, req)
         return unless METRIC_ERRORS.include? error.class
+        return unless eligible_error?(error)
 
         increment_error_counter(error, req)
       end
 
       private
+
+      def self.eligible_error?(error)
+        if error.class == HttpError
+          return error.status == 503
+        end
+        true
+      end
 
       def self.increment_error_counter(error, req)
         return unless error_counter

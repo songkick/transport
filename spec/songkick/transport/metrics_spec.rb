@@ -11,6 +11,15 @@ describe Songkick::Transport::Metrics do
         expect(subject).to receive(:increment_error_counter)
         subject.log(error, nil)
       end
+
+      context 'when the error is a HttpError with status code 503' do
+        let(:error) { Songkick::Transport::HttpError.new(nil, '503', {}, '') }
+
+        it 'should increment the counter for that error' do
+          expect(subject).to receive(:increment_error_counter)
+          subject.log(error, nil)
+        end
+      end
     end
 
     context 'when the supplied error should not be logged' do
@@ -19,6 +28,15 @@ describe Songkick::Transport::Metrics do
       it 'should increment the counter for that error' do
         expect(subject).not_to receive(:increment_error_counter)
         subject.log(error, nil)
+      end
+
+      context 'when the error is a HttpError not with status code 503' do
+        let(:error) { Songkick::Transport::HttpError.new(nil, '400', {}, '') }
+
+        it 'should increment the counter for that error' do
+          expect(subject).not_to receive(:increment_error_counter)
+          subject.log(error, nil)
+        end
       end
     end
   end
