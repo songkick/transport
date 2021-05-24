@@ -27,10 +27,20 @@ module Songkick
 
       describe 'handling errors' do
         when_request_raises_the_exception(Curl::Err::HostResolutionError)   { it_should_raise(Transport::HostResolutionError)   }
-        when_request_raises_the_exception(Curl::Err::ConnectionFailedError) { it_should_raise(Transport::ConnectionFailedError) }
         when_request_raises_the_exception(Curl::Err::TimeoutError)          { it_should_raise(Transport::TimeoutError)          }
         when_request_raises_the_exception(Curl::Err::GotNothingError)       { it_should_raise(Transport::UpstreamError)         }
         when_request_raises_the_exception(Curl::Err::RecvError)             { it_should_raise(Transport::UpstreamError)         }
+      end
+
+      describe 'when a connection to a host fails' do
+          let(:curl) { instance_double(Curl::Easy, :headers => {}).as_null_object }
+          before { allow(curl).to receive(:http).and_raise(Curl::Err::ConnectionFailedError) }
+          class_exec do
+            it "should raise error #{Transport::ConnectionFailedError} after 3 attempts" do
+              expect { subject.execute_request(request) }.to raise_error(Transport::ConnectionFailedError)
+              expect(subject.attempts).to eq 3
+            end
+          end
       end
 
       describe 'headers parsing' do

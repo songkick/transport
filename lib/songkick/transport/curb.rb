@@ -19,6 +19,7 @@ module Songkick
       def initialize(host, options = {})
         super(host, options)
         @no_signal  = !!options[:no_signal]
+        @attempts = 0
         Thread.current[:transport_curb_easy] ||= options[:connection]
       end
 
@@ -32,6 +33,10 @@ module Songkick
 
       def instrumentation_payload_extras=(extras)
         Thread.current[:transport_curb_payload_extras] = {}
+      end
+
+      def attempts
+        @attempts
       end
 
       def execute_request(req)
@@ -80,7 +85,12 @@ module Songkick
 
       rescue Curl::Err::ConnectionFailedError => error
         logger.warn "Could not connect to host: #{@host}"
-        raise Transport::ConnectionFailedError, req
+        if (@attempts += 1) < 3
+          logger.warn "Retrying connection to host: #{@host}"
+          retry
+        else
+          raise Transport::ConnectionFailedError, req
+        end
 
       rescue Curl::Err::TimeoutError => error
         logger.warn "Request timed out after #{timeout}s : #{req}"
