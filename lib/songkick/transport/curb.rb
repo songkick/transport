@@ -105,6 +105,7 @@ module Songkick
         raise Transport::UpstreamError, req
 
       end
+      @attempts = 0
     end
 
   end
