@@ -92,6 +92,15 @@ module Songkick
           raise Transport::ConnectionFailedError, req
         end
 
+      rescue Curl::Err::SendError => error
+        logger.warn "Could not send data to host: #{@host}"
+        if (@attempts += 1) < 3
+          logger.warn "Retrying sending to host: #{@host}"
+          retry
+        else
+          raise Transport::SendError, req
+        end
+
       rescue Curl::Err::TimeoutError => error
         logger.warn "Request timed out after #{timeout}s : #{req}"
         raise Transport::TimeoutError, req

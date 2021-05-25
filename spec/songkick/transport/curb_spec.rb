@@ -43,6 +43,17 @@ module Songkick
           end
       end
 
+      describe 'when a sending data to a host fails' do
+          let(:curl) { instance_double(Curl::Easy, :headers => {}).as_null_object }
+          before { allow(curl).to receive(:http).and_raise(Curl::Err::SendError) }
+          class_exec do
+            it "should raise error #{Transport::SendError} after 3 attempts" do
+              expect { subject.execute_request(request) }.to raise_error(Transport::SendError)
+              expect(subject.attempts).to eq 3
+            end
+          end
+      end
+
       describe 'headers parsing' do
         let(:curl) { instance_double(Curl::Easy, :response_code => 200, :headers => {}).as_null_object }
 
