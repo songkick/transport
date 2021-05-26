@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name                  = "songkick-transport"
-  s.version               = "2.1.6"
+  s.version               = "2.1.7"
   s.license               = "MIT"
   s.summary               = "HTTP client abstraction for service clients"
   s.description           = "HTTP client abstraction for service clients"

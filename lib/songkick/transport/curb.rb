@@ -85,8 +85,10 @@ module Songkick
 
       rescue Curl::Err::ConnectionFailedError => error
         logger.warn "Could not connect to host: #{@host}"
-        if (@attempts += 1) < 3
-          logger.warn "Retrying connection to host: #{@host}"
+        if @attempts < 3
+          @attempts += 1
+          logger.warn "Retrying (#{@attempts}/3) connecting to host: #{@host}"
+          sleep 0.1
           retry
         else
           raise Transport::ConnectionFailedError, req
@@ -94,8 +96,10 @@ module Songkick
 
       rescue Curl::Err::SendError => error
         logger.warn "Could not send data to host: #{@host}"
-        if (@attempts += 1) < 3
-          logger.warn "Retrying sending to host: #{@host}"
+        if @attempts < 3
+          @attempts += 1
+          logger.warn "Retrying (#{@attempts}/3) sending to host: #{@host}"
+          sleep 0.1
           retry
         else
           raise Transport::SendError, req
