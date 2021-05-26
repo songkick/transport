@@ -36,9 +36,9 @@ module Songkick
           let(:curl) { instance_double(Curl::Easy, :headers => {}).as_null_object }
           before { allow(curl).to receive(:http).and_raise(Curl::Err::ConnectionFailedError) }
           class_exec do
-            it "should raise error #{Transport::ConnectionFailedError} after 3 attempts" do
+            it "should raise error #{Transport::ConnectionFailedError} after 3 retries" do
+              expect(curl).to receive(:http).exactly(4).times
               expect { subject.execute_request(request) }.to raise_error(Transport::ConnectionFailedError)
-              expect(subject.attempts).to eq 3
             end
           end
       end
@@ -47,9 +47,9 @@ module Songkick
           let(:curl) { instance_double(Curl::Easy, :headers => {}).as_null_object }
           before { allow(curl).to receive(:http).and_raise(Curl::Err::SendError) }
           class_exec do
-            it "should raise error #{Transport::SendError} after 3 attempts" do
+            it "should raise error #{Transport::SendError} after 3 retries" do
+              expect(curl).to receive(:http).exactly(4).times
               expect { subject.execute_request(request) }.to raise_error(Transport::SendError)
-              expect(subject.attempts).to eq 3
             end
           end
       end

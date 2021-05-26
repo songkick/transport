@@ -19,7 +19,6 @@ module Songkick
       def initialize(host, options = {})
         super(host, options)
         @no_signal  = !!options[:no_signal]
-        @attempts = 0
         Thread.current[:transport_curb_easy] ||= options[:connection]
       end
 
@@ -33,10 +32,6 @@ module Songkick
 
       def instrumentation_payload_extras=(extras)
         Thread.current[:transport_curb_payload_extras] = {}
-      end
-
-      def attempts
-        @attempts
       end
 
       def execute_request(req)
@@ -76,7 +71,6 @@ module Songkick
           self.instrumentation_payload_extras[:connect_time] = connection.connect_time
           self.instrumentation_payload_extras[:name_lookup_time] = connection.name_lookup_time
         end
-
         process(req, connection.response_code, response_headers, connection.body_str)
 
       rescue Curl::Err::HostResolutionError => error
@@ -85,24 +79,29 @@ module Songkick
 
       rescue Curl::Err::ConnectionFailedError => error
         logger.warn "Could not connect to host: #{@host}"
-        if @attempts < 3
-          @attempts += 1
-          logger.warn "Retrying (#{@attempts}/3) connecting to host: #{@host}"
+        retries ||= 0
+        if retries < 3
+          retries += 1
+          logger.warn "Retrying (#{retries}/3) connecting to host: #{@host}"
           sleep 0.1
           retry
         else
           raise Transport::ConnectionFailedError, req
+          retries=0
         end
 
+
       rescue Curl::Err::SendError => error
+        retries ||= 0
         logger.warn "Could not send data to host: #{@host}"
-        if @attempts < 3
-          @attempts += 1
-          logger.warn "Retrying (#{@attempts}/3) sending to host: #{@host}"
+        if retries < 3
+          retries += 1
+          logger.warn "Retrying (#{retries}/3) sending to host: #{@host}"
           sleep 0.1
           retry
         else
           raise Transport::SendError, req
+          retries=0
         end
 
       rescue Curl::Err::TimeoutError => error
@@ -118,7 +117,6 @@ module Songkick
         raise Transport::UpstreamError, req
 
       end
-      @attempts = 0
     end
 
   end
