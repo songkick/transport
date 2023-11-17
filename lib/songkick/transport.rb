@@ -54,6 +54,7 @@ module Songkick
     end
 
     register_parser 'application/json', Yajl::Parser
+    register_parser 'application/vnd.api+json', Yajl::Parser
 
     IO = UploadIO
 
